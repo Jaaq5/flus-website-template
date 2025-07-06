@@ -65,6 +65,7 @@ update_system() {
 #   None; exits on update_system failure.
 #######################################
 main() {
+  echo -e "${ORANGE}🚀 Ejecutando actualización del sistema...${NC}"
   update_system
   echo -e "${GREEN}¡El sistema ha sido actualizado con éxito!${NC}\n"
 }

@@ -5,7 +5,7 @@
 # Purpose: Run all initial production configuration scripts.
 # Usage: ./install.sh
 # Dependencies: sudo, apt-get, update_system.sh, configure_timezone.sh,
-#               dpkg-query, dependencies.sh, 
+#               dpkg-query, dependencies.sh, install_starship.sh 
 #
 
 # Exit immediately if a command fails (-e),
@@ -45,7 +45,6 @@ run_update() {
     chmod +x "$update_script"
   fi
 
-  echo -e "${ORANGE}🚀 Ejecutando actualización del sistema...${NC}"
   "$update_script"
 }
 
@@ -70,7 +69,6 @@ configure_timezone() {
     chmod +x "$tz_script"
   fi
 
-  echo -e "${ORANGE}🌐 Configurando zona horaria...${NC}"
   "$tz_script"
 }
 
@@ -86,18 +84,42 @@ configure_timezone() {
 #   Exits non-zero on failure
 #######################################
 install_dependencies() {
-  local script="./dependencies.sh"
-  if [[ ! -f "$script" ]]; then
-    echo -e "${RED}❌ El script $script no existe.${NC}" >&2
+  local d_script="./dependencies.sh"
+  if [[ ! -f "$d_script" ]]; then
+    echo -e "${RED}❌ El script $d_script no existe.${NC}" >&2
     exit 1
   fi
-  if [[ ! -x "$script" ]]; then
-    chmod +x "$script"
+  if [[ ! -x "$d_script" ]]; then
+    chmod +x "$d_script"
   fi
 
-  echo -e "\n${ORANGE}🔧 Verificando e instalando dependencias...${NC}"
-  "$script"
+  "$d_script"
 }
+
+#######################################
+# Verify/install Starship via install_starship.sh.
+# Globals:
+#   None
+# Arguments:
+#   None
+# Outputs:
+#   Messages to STDOUT and STDERR
+# Returns:
+#   Exits non-zero on failure
+#######################################
+install_starship() {
+  local s_script="./dependencies.sh"
+  if [[ ! -f "$s_script" ]]; then
+    echo -e "${RED}❌ El script $s_script no existe.${NC}" >&2
+    exit 1
+  fi
+  if [[ ! -x "$s_script" ]]; then
+    chmod +x "$s_script"
+  fi
+
+  "$s_script"
+}
+
 
 #######################################
 # Main entry point.
@@ -120,6 +142,8 @@ main() {
   configure_timezone
 
   install_dependencies
+
+  install_starship
 
   echo -e "${GREEN}✅ Configuración de producción completada con éxito!${NC}\n"
 }

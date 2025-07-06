@@ -70,9 +70,9 @@ configure_timezone() {
 #   None; exits on failures.
 #######################################
 main() {
+  echo -e "${ORANGE}🌐 Configurando zona horaria...${NC}"
   configure_timezone
   echo -e "${GREEN}¡Configuración de la zona horaria con éxito!${NC}\n"
-  echo ""
 }
 
 main "$@"
