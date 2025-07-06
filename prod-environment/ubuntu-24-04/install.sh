@@ -35,7 +35,7 @@ run_update() {
 
   # Ensure update.sh exists
   if [[ ! -f "$update_script" ]]; then
-    echo "❌ ${RED}El script $update_script no existe.${NC}" >&2
+    echo "${RED}❌ El script $update_script no existe.${NC}" >&2
     exit 1
   fi
 
@@ -44,7 +44,7 @@ run_update() {
     chmod +x "$update_script"
   fi
 
-  echo "🚀 ${ORANGE}Ejecutando actualización del sistema...${NC}"
+  echo "${ORANGE}🚀 Ejecutando actualización del sistema...${NC}"
   "$update_script"
 }
 
@@ -62,14 +62,14 @@ run_update() {
 configure_timezone() {
   local tz_script="./configure_timezone.sh"
   if [[ ! -f "$tz_script" ]]; then
-    echo "❌ ${RED}El script $tz_script no existe.${NC}" >&2
+    echo "${RED}❌ El script $tz_script no existe.${NC}" >&2
     exit 1
   fi
   if [[ ! -x "$tz_script" ]]; then
     chmod +x "$tz_script"
   fi
 
-  echo "🌐 ${ORANGE}Configurando zona horaria...${NC}"
+  echo "${ORANGE}🌐 Configurando zona horaria...${NC}"
   "$tz_script"
 }
 
@@ -93,7 +93,7 @@ main() {
 
   configure_timezone
 
-  echo -e "✅ ${GREEN}Configuración de producción completada con éxito!${NC}"
+  echo -e "${GREEN}✅ Configuración de producción completada con éxito!${NC}"
 }
 
 main "$@"
