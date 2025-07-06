@@ -31,21 +31,21 @@ NC='\033[0m'         # No color (reset)
 #   Exits with non-zero on failure of any apt operation.
 #######################################
 update_system() {
-  echo -e "${ORANGE}Actualizando la lista de paquetes disponibles...${NC}"
+  echo -e "Actualizando la lista de paquetes disponibles..."
   sudo apt-get update -qq 1>/dev/null
   if [[ $? -ne 0 ]]; then
     echo -e "${RED}Error al actualizar la lista de paquetes.${NC}" >&2
     exit 1
   fi
 
-  echo -e "${ORANGE}Actualizando los paquetes instalados...${NC}"
+  echo -e "Actualizando los paquetes instalados..."
   sudo apt-get upgrade -y -qq 1>/dev/null
   if [[ $? -ne 0 ]]; then
     echo -e "${RED}Error al actualizar los paquetes instalados.${NC}" >&2
     exit 1
   fi
 
-  echo -e "${ORANGE}Eliminando paquetes innecesarios...${NC}"
+  echo -e "Eliminando paquetes innecesarios..."
   sudo apt-get autoremove -y -qq 1>/dev/null
   if [[ $? -ne 0 ]]; then
     echo -e "${RED}Error al eliminar paquetes innecesarios.${NC}" >&2
@@ -66,8 +66,7 @@ update_system() {
 #######################################
 main() {
   update_system
-  echo -e "${GREEN}¡El sistema ha sido actualizado con éxito!${NC}"
-  echo ""
+  echo -e "${GREEN}¡El sistema ha sido actualizado con éxito!${NC}\n"
 }
 
 main "$@"

@@ -33,7 +33,7 @@ NC='\033[0m'         # No color (reset)
 #######################################
 configure_timezone() {
   local target="America/Costa_Rica"
-  echo -e "${ORANGE}Verificando la zona horaria actual...${NC}"
+  echo -e "Verificando la zona horaria actual..."
 
   local current
   current=$(timedatectl | awk '/Time zone/ {print $3}')
@@ -43,10 +43,10 @@ configure_timezone() {
     return 0
   fi
 
-  echo -e "${ORANGE}Configurando la zona horaria a $target...${NC}"
+  echo -e "Configurando la zona horaria a $target..."
   sudo timedatectl set-timezone "$target"
 
-  echo -e "${ORANGE}Verificando la nueva configuración de zona horaria...${NC}"
+  echo -e "Verificando la nueva configuración de zona horaria..."
   local updated
   updated=$(timedatectl | awk '/Time zone/ {print $3}')
 
@@ -71,7 +71,7 @@ configure_timezone() {
 #######################################
 main() {
   configure_timezone
-  echo -e "${GREEN}¡Configuración de la zona horaria con éxito!${NC}"
+  echo -e "${GREEN}¡Configuración de la zona horaria con éxito!${NC}\n"
   echo ""
 }
 
