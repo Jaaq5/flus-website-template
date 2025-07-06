@@ -1,5 +1,5 @@
 #!/bin/bash
-# Style guide used https://google.github.io/styleguide/shellguide.html
+# Style guide https://google.github.io/styleguide/shellguide.html
 #
 # install.sh
 # Purpose: Run all initial production configuration scripts.
@@ -11,6 +11,12 @@
 # Treat unset variables as errors (-u),
 # and fail the entire script if any command in a pipeline fails (-o pipefail).
 set -euo pipefail
+
+# Define color codes for terminal output
+GREEN='\033[0;32m'   # Success
+ORANGE='\033[0;33m'  # Info/warning
+RED='\033[0;31m'     # Error
+NC='\033[0m'         # No color (reset)
 
 #######################################
 # Execute the update script to refresh the system.
@@ -29,7 +35,7 @@ run_update() {
 
   # Ensure update.sh exists
   if [[ ! -f "$update_script" ]]; then
-    echo "❌ El script $update_script no existe." >&2
+    echo "❌ ${RED}El script $update_script no existe.${NC}" >&2
     exit 1
   fi
 
@@ -38,7 +44,7 @@ run_update() {
     chmod +x "$update_script"
   fi
 
-  echo "🚀 Ejecutando actualización del sistema..."
+  echo "🚀 ${ORANGE}Ejecutando actualización del sistema...${NC}"
   "$update_script"
 }
 
@@ -56,14 +62,14 @@ run_update() {
 configure_timezone() {
   local tz_script="./configure_timezone.sh"
   if [[ ! -f "$tz_script" ]]; then
-    echo "❌ El script $tz_script no existe." >&2
+    echo "❌ ${RED}El script $tz_script no existe.${NC}" >&2
     exit 1
   fi
   if [[ ! -x "$tz_script" ]]; then
     chmod +x "$tz_script"
   fi
 
-  echo "🌐 Configurando zona horaria..."
+  echo "🌐 ${ORANGE}Configurando zona horaria...${NC}"
   "$tz_script"
 }
 
@@ -87,7 +93,7 @@ main() {
 
   configure_timezone
 
-  echo -e "${GREEN}✅ Configuración de producción completada con éxito!${NC}"
+  echo -e "✅ ${GREEN}Configuración de producción completada con éxito!${NC}"
 }
 
 main "$@"

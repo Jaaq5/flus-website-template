@@ -1,5 +1,5 @@
 #!/bin/bash
-# Style guide used https://google.github.io/styleguide/shellguide.html
+# Style guide https://google.github.io/styleguide/shellguide.html
 #
 # configure_timezone.sh
 # Purpose: Verify and configure system timezone to America/Costa_Rica.
@@ -72,6 +72,7 @@ configure_timezone() {
 main() {
   configure_timezone
   echo -e "${GREEN}¡Configuración de la zona horaria con éxito!${NC}"
+  echo ""
 }
 
 main "$@"

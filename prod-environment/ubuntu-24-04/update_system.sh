@@ -1,5 +1,5 @@
 #!/bin/bash
-# Style guide used https://google.github.io/styleguide/shellguide.html
+# Style guide https://google.github.io/styleguide/shellguide.html
 #
 # update_system.sh
 # Purpose: Update and upgrade Ubuntu system packages.
@@ -12,11 +12,11 @@
 # and fail the entire script if any command in a pipeline fails (-o pipefail).
 set -euo pipefail
 
-# Color codes
-GREEN='\033[0;32m'      # Success
-ORANGE='\033[0;33m'     # Info/warning
-RED='\033[0;31m'        # Error
-NC='\033[0m'            # No color (reset)
+# Define color codes for terminal output
+GREEN='\033[0;32m'   # Success
+ORANGE='\033[0;33m'  # Info/warning
+RED='\033[0;31m'     # Error
+NC='\033[0m'         # No color (reset)
 
 #######################################
 # Update and clean up system packages.
@@ -67,6 +67,7 @@ update_system() {
 main() {
   update_system
   echo -e "${GREEN}¡El sistema ha sido actualizado con éxito!${NC}"
+  echo ""
 }
 
 main "$@"
