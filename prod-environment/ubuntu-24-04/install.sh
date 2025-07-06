@@ -108,7 +108,7 @@ install_dependencies() {
 #   Exits non-zero on failure
 #######################################
 install_starship() {
-  local s_script="./dependencies.sh"
+  local s_script="./install_starship.sh"
   if [[ ! -f "$s_script" ]]; then
     echo -e "${RED}❌ El script $s_script no existe.${NC}" >&2
     exit 1
@@ -145,7 +145,7 @@ main() {
 
   install_starship
 
-  echo -e "${GREEN}✅ Configuración de producción completada con éxito!${NC}\n"
+  echo -e "${GREEN}✅ !Configuración de producción completada con éxito!${NC}\n"
 }
 
 main "$@"
