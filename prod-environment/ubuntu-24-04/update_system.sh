@@ -67,7 +67,7 @@ update_system() {
 main() {
   echo -e "${ORANGE}🚀 Ejecutando actualización del sistema...${NC}"
   update_system
-  echo -e "${GREEN}¡El sistema ha sido actualizado con éxito!${NC}\n"
+  echo -e "${GREEN}¡El sistema se ha sido actualizado con éxito!${NC}\n"
 }
 
 main "$@"

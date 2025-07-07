@@ -68,8 +68,6 @@ install_starship() {
         echo 'eval "$(starship init bash)"' >> ~/.bashrc
         echo -e "${GREEN}Inicialización de Starship añadida a ~/.bashrc${NC}"
     fi
-
-    echo -e "${GREEN}Starship instalado correctamente.${NC}"
 }
 
 #######################################
@@ -84,9 +82,9 @@ install_starship() {
 #   None; exits on any error
 #######################################
 main() {
-  echo -e "${ORANGE}🔧 Verificando e instalando starship...${NC}"
+  echo -e "${ORANGE}🔧 Verificando e instalando Starship...${NC}"
   install_starship
-  echo -e "${GREEN}Starship instalado exitosamente.${NC}\n"
+  echo -e "${GREEN}Starship instalado correctamente..${NC}\n"
 }
 
 main "$@"
