@@ -84,6 +84,8 @@ install_ble() {
         echo '[[ ! ${BLE_VERSION-} ]] || ble-attach' >> ~/.bashrc
         echo -e "Línea de attachment de ble.sh añadida a ~/.bashrc"
     fi
+
+    echo -e "${GREEN}!ble.sh instalado correctamente!${NC}\n"
 }
 
 #######################################
@@ -98,7 +100,7 @@ install_ble() {
 main() {
     echo -e "${ORANGE}🔧 Verificando e instalando ble.sh...${NC}"
     install_ble
-    echo -e "${GREEN}ble.sh instalado correctamente.${NC}\n"
+    
 }
 
 main "$@"

@@ -45,7 +45,7 @@ install_starship() {
 
     if command_exists starship; then
         echo -e "${ORANGE}Starship ya está instalado.${NC}"
-        starship --version
+        #starship --version
         return 0
     fi
 
@@ -68,6 +68,8 @@ install_starship() {
         echo 'eval "$(starship init bash)"' >> ~/.bashrc
         echo -e "${GREEN}Inicialización de Starship añadida a ~/.bashrc${NC}"
     fi
+
+    echo -e "${GREEN}Starship instalado correctamente..${NC}\n"
 }
 
 #######################################
@@ -84,7 +86,7 @@ install_starship() {
 main() {
   echo -e "${ORANGE}🔧 Verificando e instalando Starship...${NC}"
   install_starship
-  echo -e "${GREEN}Starship instalado correctamente..${NC}\n"
+  
 }
 
 main "$@"

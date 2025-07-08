@@ -173,7 +173,7 @@ main() {
 
   install_ble
 
-  echo -e "${GREEN}✅ !Configuración de producción completada con éxito!${NC}\n"
+  echo -e "${GREEN}✅ !Configuración de producción completada con éxito!${NC}"
 }
 
 main "$@"

@@ -10,7 +10,7 @@
 # Exit immediately if a command fails (-e),
 # Treat unset variables as errors (-u),
 # and fail the entire script if any command in a pipeline fails (-o pipefail).
-set -euo pipefail  # Exit on error, unset variable, or pipeline failure
+set -euo pipefail
 
 # Color codes for terminal output
 GREEN='\033[0;32m'   # Success
@@ -50,11 +50,13 @@ install_pkg() {
   echo -e "Instalando paquete: ${pkg}..."
   sudo NEEDRESTART_MODE=a apt-get install -y -qq "$pkg" 1>/dev/null
   if [[ $? -eq 0 ]]; then
-    echo -e "${GREEN}Paquete ${pkg} instalado correctamente.${NC}"
+    echo -e "${GREEN}Paquete ${pkg} instalado correctamente${NC}"
   else
-    echo -e "${RED}Error al instalar paquete: ${pkg}.${NC}" >&2
+    echo -e "${RED}Error al instalar paquete: ${pkg}${NC}" >&2
     exit 1
   fi
+
+  echo -e "${GREEN}!Dependencias instaladas correctamente!${NC}\n"
 }
 
 #######################################
@@ -71,7 +73,7 @@ install_pkg() {
 check_and_install_dependencies() {
   for pkg in "${packages[@]}"; do
     if is_installed "$pkg"; then
-      echo -e "${ORANGE}Ya está instalado: ${pkg}.${NC}"
+      echo -e "${ORANGE}Ya está instalado: ${pkg}${NC}"
     else
       install_pkg "$pkg"
     fi
@@ -92,7 +94,7 @@ check_and_install_dependencies() {
 main() {
   echo -e "${ORANGE}🔧 Verificando e instalando dependencias...${NC}"
   check_and_install_dependencies
-  echo -e "${GREEN}Todas las dependencias están instaladas.${NC}\n"
+  
 }
 
 main "$@"

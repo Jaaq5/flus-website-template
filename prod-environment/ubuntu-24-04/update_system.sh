@@ -51,6 +51,8 @@ update_system() {
     echo -e "${RED}Error al eliminar paquetes innecesarios.${NC}" >&2
     exit 1
   fi
+
+  echo -e "${GREEN}¡Sistema actualizado con correctamente!${NC}\n"
 }
 
 #######################################
@@ -67,7 +69,6 @@ update_system() {
 main() {
   echo -e "${ORANGE}🚀 Ejecutando actualización del sistema...${NC}"
   update_system
-  echo -e "${GREEN}¡El sistema se ha sido actualizado con éxito!${NC}\n"
 }
 
 main "$@"
