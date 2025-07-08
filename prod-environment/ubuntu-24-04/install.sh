@@ -5,7 +5,8 @@
 # Purpose: Run all initial production configuration scripts.
 # Usage: ./install.sh
 # Dependencies: sudo, apt-get, update_system.sh, configure_timezone.sh,
-#               dpkg-query, dependencies.sh, install_starship.sh 
+#               dpkg-query, dependencies.sh, install_starship.sh
+#               install_ble.sh
 #
 
 # Exit immediately if a command fails (-e),
@@ -122,6 +123,31 @@ install_starship() {
 
 
 #######################################
+# Verify/install ble.sh via install_ble.sh.
+# Globals:
+#   None
+# Arguments:
+#   None
+# Outputs:
+#   Messages to STDOUT and STDERR
+# Returns:
+#   Exits non-zero on failure
+#######################################
+install_ble() {
+  local b_script="./install_ble.sh"
+  if [[ ! -f "$b_script" ]]; then
+    echo -e "${RED}❌ El script $b_script no existe.${NC}" >&2
+    exit 1
+  fi
+  if [[ ! -x "$b_script" ]]; then
+    chmod +x "$b_script"
+  fi
+
+  "$b_script"
+}
+
+
+#######################################
 # Main entry point.
 # Globals:
 #   None
@@ -144,6 +170,8 @@ main() {
   install_dependencies
 
   install_starship
+
+  install_ble
 
   echo -e "${GREEN}✅ !Configuración de producción completada con éxito!${NC}\n"
 }
