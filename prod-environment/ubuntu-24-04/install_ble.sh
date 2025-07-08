@@ -55,7 +55,7 @@ install_ble() {
         echo -e "${RED}Error al clonar el repositorio de ble.sh.${NC}" >&2
         exit 1
     fi
-    echo -e "${GREEN}Repositorio de ble.sh clonado correctamente.${NC}"
+    echo -e "Repositorio de ble.sh clonado correctamente."
 
     # Build and install ble.sh
     cd ~/.local/src/ble.sh
@@ -65,7 +65,7 @@ install_ble() {
         echo -e "${RED}Error al construir ble.sh.${NC}" >&2
         exit 1
     fi
-    echo -e "${GREEN}ble.sh construido exitosamente.${NC}"
+    echo -e "ble.sh construido exitosamente."
 
     echo "Instalando ble.sh..."
     if ! make install > /dev/null 2>&1; then
@@ -76,13 +76,13 @@ install_ble() {
     # Add ble.sh configuration to ~/.bashrc
     if ! grep -q 'source ~/.local/share/blesh/ble.sh --noattach' ~/.bashrc; then
         echo '[[ $- == *i* ]] && source ~/.local/share/blesh/ble.sh --noattach' >> ~/.bashrc
-        echo -e "${GREEN}Configuración de ble.sh añadida a ~/.bashrc${NC}"
+        echo -e "Configuración de ble.sh añadida a ~/.bashrc"
     fi
 
     # Add ble-attach line at the end of ~/.bashrc
     if ! grep -q '[[ ! ${BLE_VERSION-} ]] || ble-attach' ~/.bashrc; then
         echo '[[ ! ${BLE_VERSION-} ]] || ble-attach' >> ~/.bashrc
-        echo -e "${GREEN}Línea de attachment de ble.sh añadida a ~/.bashrc${NC}"
+        echo -e "Línea de attachment de ble.sh añadida a ~/.bashrc"
     fi
 }
 
