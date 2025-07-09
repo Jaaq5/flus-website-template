@@ -7,7 +7,8 @@
 # Dependencies: sudo, apt-get, dpkg-query
 #               update_system.sh, configure_timezone.sh,
 #               dependencies.sh, install_starship.sh,
-#               install_ble.sh, install_lsd.sh, install_bat.sh
+#               install_ble.sh, install_lsd.sh, install_bat.sh,
+#               configure_terminal.sh
 #
 
 # Exit on error, unset variable, or pipeline failure
@@ -70,6 +71,7 @@ main() {
   run_script "./install_ble.sh"
   run_script "./install_lsd.sh"
   run_script "./install_bat.sh"
+  run_script "./configure_terminal.sh"
 
   echo -e "${GREEN}✅ ¡Configuración de producción completada con éxito!${NC}"
 }
