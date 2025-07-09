@@ -42,14 +42,14 @@ install_lsd() {
     echo -e "Verificando instalación de lsd..."
 
     if command_exists lsd; then
-        echo -e "${ORANGE}lsd ya está instalado.${NC}/n"
+        echo -e "${ORANGE}lsd ya está instalado.${NC}\n"
         return 0
     fi
 
     echo -e "Instalando lsd..."
 
     # Install lsd silently
-    sudo NEEDRESTART_MODE=a apt-get install -y -qq lsd 1>/dev/null
+    sudo NEEDRESTART_SUSPEND=1 apt-get install -y -qq lsd 1>/dev/null
     if [[ $? -ne 0 ]]; then
         echo -e "${RED}Error al instalar lsd.${NC}" >&2
         exit 1

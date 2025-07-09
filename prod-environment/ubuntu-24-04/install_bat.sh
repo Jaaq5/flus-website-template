@@ -48,7 +48,7 @@ install_bat() {
     echo -e "Instalando bat..."
 
     # Install 'bat' silently and suppress needrestart messages
-    sudo NEEDRESTART_MODE=a apt-get install -y -qq bat 1>/dev/null
+    sudo NEEDRESTART_SUSPEND=1 apt-get install -y -qq bat 1>/dev/null
     if [[ $? -ne 0 ]]; then
         echo -e "${RED}Error al instalar bat${NC}" >&2
         exit 1

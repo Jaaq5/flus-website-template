@@ -43,7 +43,7 @@ run_script() {
     chmod +x "$script"
   fi
 
-# Execute the script
+  # Execute the script
   "$script"
 }
 

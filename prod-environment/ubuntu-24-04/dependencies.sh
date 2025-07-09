@@ -48,7 +48,7 @@ is_installed() {
 install_pkg() {
   local pkg="$1"
   echo -e "Instalando paquete: ${pkg}..."
-  sudo NEEDRESTART_MODE=a apt-get install -y -qq "$pkg" 1>/dev/null
+  sudo NEEDRESTART_SUSPEND=1 apt-get install -y -qq "$pkg" 1>/dev/null
   if [[ $? -eq 0 ]]; then
     echo -e "${GREEN}Paquete ${pkg} instalado correctamente${NC}"
   else

@@ -30,21 +30,21 @@ NC='\033[0m'         # No color (reset)
 #######################################
 update_system() {
   echo -e "Actualizando la lista de paquetes disponibles..."
-  sudo NEEDRESTART_MODE=a apt-get update -qq 1>/dev/null
+  sudo NEEDRESTART_SUSPEND=1 apt-get update -qq 1>/dev/null
   if [[ $? -ne 0 ]]; then
     echo -e "${RED}Error al actualizar la lista de paquetes.${NC}" >&2
     exit 1
   fi
 
   echo -e "Actualizando los paquetes instalados..."
-  sudo NEEDRESTART_MODE=a apt-get upgrade -y -qq 1>/dev/null
+  sudo NEEDRESTART_SUSPEND=1 apt-get upgrade -y -qq 1>/dev/null
   if [[ $? -ne 0 ]]; then
     echo -e "${RED}Error al actualizar los paquetes instalados.${NC}" >&2
     exit 1
   fi
 
   echo -e "Eliminando paquetes innecesarios..."
-  sudo NEEDRESTART_MODE=a apt-get autoremove -y -qq 1>/dev/null
+  sudo NEEDRESTART_SUSPEND=1 apt-get autoremove -y -qq 1>/dev/null
   if [[ $? -ne 0 ]]; then
     echo -e "${RED}Error al eliminar paquetes innecesarios.${NC}" >&2
     exit 1

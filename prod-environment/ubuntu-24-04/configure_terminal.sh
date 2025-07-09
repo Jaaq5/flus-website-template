@@ -28,17 +28,17 @@ NC='\033[0m'         # No color (reset)
 configure_term() {
     
     if grep -q 'export TERM=xterm-256color' ~/.bashrc; then
-        echo -e "${ORANGE}La configuración TERM ya está en ~/.bashrc${NC}"
+        echo -e "${ORANGE}La configuración TERM ya está en ~/.bashrc${NC}\n"
+        exit 0
     else
         echo 'export TERM=xterm-256color' >> ~/.bashrc
-        echo -e "${GREEN}TERM=xterm-256color añadido a ~/.bashrc${NC}"
+        echo -e "TERM=xterm-256color añadido a ~/.bashrc"
     fi
 
     source ~/.bashrc
-    echo -e "~/.bashrc recargado"
+    echo -e "${GREEN}term configurado correctamente${NC}"
 
-    echo ""
-    echo -e "Sal de la sesión e inicia de nuevo para ver los cambios"
+    echo -e "Sal de la sesión e inicia de nuevo para ver los cambios\n"
 }
 
 #######################################
