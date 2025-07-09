@@ -39,7 +39,7 @@ configure_timezone() {
   current=$(timedatectl | awk '/Time zone/ {print $3}')
 
   if [[ "$current" == "$target" ]]; then
-    echo -e "${ORANGE}La zona horaria ya está configurada en $target.${NC}"
+    echo -e "${ORANGE}La zona horaria ya está configurada en $target${NC}\n"
     return 0
   fi
 
@@ -51,9 +51,9 @@ configure_timezone() {
   updated=$(timedatectl | awk '/Time zone/ {print $3}')
 
   if [[ "$updated" == "$target" ]]; then
-    echo -e "${GREEN}Zona horaria configurada correctamente a $target.${NC}"
+    echo -e "${GREEN}Zona horaria configurada correctamente a $target${NC}\n"
   else
-    echo -e "${RED}Error al configurar la zona horaria.${NC}" >&2
+    echo -e "${RED}Error al configurar la zona horaria${NC}\n" >&2
     exit 1
   fi
 }

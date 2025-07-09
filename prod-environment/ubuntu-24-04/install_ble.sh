@@ -42,7 +42,7 @@ install_ble() {
     echo -e "Verificando instalación de ble.sh..."
 
     if [ -d ~/.local/share/blesh ]; then
-        echo -e "${ORANGE}ble.sh ya está instalado.${NC}"
+        echo -e "${ORANGE}ble.sh ya está instalado${NC}\n"
         return 0
     fi
 
@@ -99,8 +99,7 @@ install_ble() {
 #######################################
 main() {
     echo -e "${ORANGE}🔧 Verificando e instalando ble.sh...${NC}"
-    install_ble
-    
+    install_ble  
 }
 
 main "$@"

@@ -78,6 +78,7 @@ check_and_install_dependencies() {
       install_pkg "$pkg"
     fi
   done
+  echo ""
 }
 
 #######################################
@@ -94,7 +95,6 @@ check_and_install_dependencies() {
 main() {
   echo -e "${ORANGE}🔧 Verificando e instalando dependencias...${NC}"
   check_and_install_dependencies
-  
 }
 
 main "$@"

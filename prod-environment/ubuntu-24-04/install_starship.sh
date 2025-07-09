@@ -44,7 +44,7 @@ install_starship() {
     echo -e "Verificando instalación de Starship..."
 
     if command_exists starship; then
-        echo -e "${ORANGE}Starship ya está instalado.${NC}"
+        echo -e "${ORANGE}Starship ya está instalado${NC}\n"
         #starship --version
         return 0
     fi
