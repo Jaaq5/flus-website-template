@@ -39,15 +39,14 @@ command_exists() {
 #   Exits with error if installation fails.
 #######################################
 install_lsd() {
-    echo ""
     echo -e "Verificando instalación de lsd..."
 
     if command_exists lsd; then
-        echo -e "${ORANGE}lsd ya está instalado.${NC}"
+        echo -e "${ORANGE}lsd ya está instalado.${NC}/n"
         return 0
     fi
 
-    echo -e "Instalando lsd (reemplazo colorido de ls)..."
+    echo -e "Instalando lsd..."
 
     # Install lsd silently
     sudo NEEDRESTART_MODE=a apt-get install -y -qq lsd 1>/dev/null
@@ -62,7 +61,7 @@ install_lsd() {
         echo -e "Alias 'ls' configurado a 'lsd' en ~/.bashrc"
     fi
 
-    echo -e "${GREEN}lsd instalado correctamente${NC}"
+    echo -e "${GREEN}lsd instalado correctamente${NC}/n"
 }
 
 #######################################

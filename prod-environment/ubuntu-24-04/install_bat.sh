@@ -45,7 +45,7 @@ install_bat() {
         return 0
     fi
 
-    echo -e "Instalando bat (mejor 'cat')..."
+    echo -e "Instalando bat..."
 
     # Install 'bat' silently and suppress needrestart messages
     sudo NEEDRESTART_MODE=a apt-get install -y -qq bat 1>/dev/null
@@ -60,8 +60,8 @@ install_bat() {
         echo -e "Alias 'cat' configurado a 'batcat' en ~/.bashrc"
     fi
 
-    echo -e "${GREEN}bat instalado correctamente${NC}"
-
+    echo -e "${GREEN}bat instalado correctamente${NC}\n"
+}
 #######################################
 # Main entry point.
 # Globals:

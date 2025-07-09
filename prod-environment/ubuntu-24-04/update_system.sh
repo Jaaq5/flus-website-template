@@ -7,9 +7,7 @@
 # Dependencies: sudo, apt-get
 # 
 
-# Exit immediately if a command fails (-e),
-# Treat unset variables as errors (-u),
-# and fail the entire script if any command in a pipeline fails (-o pipefail).
+# Exit on error, unset variable, or pipeline failure
 set -euo pipefail
 
 # Define color codes for terminal output
@@ -52,7 +50,7 @@ update_system() {
     exit 1
   fi
 
-  echo -e "${GREEN}¡Sistema actualizado con correctamente!${NC}\n"
+  echo -e "${GREEN}¡Sistema actualizado correctamente!${NC}\n"
 }
 
 #######################################
