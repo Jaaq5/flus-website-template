@@ -63,6 +63,12 @@ main() {
   # Clear the terminal screen for better visibility
   clear
 
+  # Add where the custom configuration starts in .bashrc
+  if ! grep -qF '#Custom configuration starts here' ~/.bashrc; then
+    echo '' >> ~/.bashrc
+    echo '#Custom configuration starts here' >> ~/.bashrc
+  fi
+
   # Run each configuration script in order
   run_script "./update_system.sh"
   run_script "./configure_timezone.sh"
@@ -73,7 +79,7 @@ main() {
   run_script "./install_bat.sh"
   run_script "./configure_terminal.sh"
 
-  echo -e "${GREEN}✅ ¡Configuración de producción completada con éxito!${NC}"
+  echo -e "${GREEN}✅ ¡Configuración de producción finalizada!${NC}"
 }
 
 main "$@"
