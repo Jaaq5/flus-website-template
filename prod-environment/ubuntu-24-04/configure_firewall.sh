@@ -80,7 +80,7 @@ install_firewall() {
 
     # Check if firewalld is installed
     if command_exists firewalld; then
-        echo -e "${ORANGE}firewalld ya está instalado.${NC}"
+        echo -e "${ORANGE}firewalld ya está instalado.${NC}\n"
         return 0
     else
         # Install firewalld
@@ -109,7 +109,7 @@ install_firewall() {
         # Reload firewalld to apply changes
         sudo firewall-cmd --reload 1>/dev/null 2>&1
 
-        # Limit SSH connections
+        # Limit SSH connections to 5/m
         sudo firewall-cmd --zone=public --add-rich-rule='rule family="ipv4" service name="ssh" limit value="5/m" accept' --permanent 1>/dev/null 2>&1
 
         # Block ICMP (ping)
