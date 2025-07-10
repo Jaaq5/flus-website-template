@@ -55,7 +55,12 @@ purge_firewall() {
         sudo iptables -t mangle -F 1>/dev/null 2>&1
         sudo iptables -P INPUT ACCEPT 1>/dev/null 2>&1
         sudo iptables -P OUTPUT ACCEPT 1>/dev/null 2>&1
-        sudo iptables-save | sudo tee /etc/iptables/rules.v4 >/dev/null || true
+        
+        # Check if /etc/iptables/rules.v4 exists before saving
+        if [ -f /etc/iptables/rules.v4 ]; then
+            sudo iptables-save | sudo tee /etc/iptables/rules.v4 >/dev/null || true
+        fi
+
         sudo apt-get purge -y iptables 1>/dev/null 2>&1 || true
         echo -e "iptables desinstalado correctamente"
     fi
