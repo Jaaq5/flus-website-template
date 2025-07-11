@@ -102,20 +102,30 @@ install_firewall() {
         echo "Permitiendo SSH, HTTP y HTTPS..."
 
         # Allow SSH, HTTP, and HTTPS traffic
-        sudo firewall-cmd --zone=public --add-service=ssh --permanent 1>/dev/null 2>&1
-        sudo firewall-cmd --zone=public --add-service=http --permanent 1>/dev/null 2>&1
-        sudo firewall-cmd --zone=public --add-service=https --permanent 1>/dev/null 2>&1
+        sudo firewall-cmd --zone=public --add-service=ssh 1>/dev/null 2>&1
+        sudo firewall-cmd --zone=public --add-service=http 1>/dev/null 2>&1
+        sudo firewall-cmd --zone=public --add-service=https 1>/dev/null 2>&1
+
+        # Limit SSH connections to 2/m and save log
+        sudo firewall-cmd --zone=public --add-rich-rule='rule service name="ssh" limit value="2/m" log prefix="SSH_RATE" level="notice" accept' 1>/dev/null 2>&1
+        # Run in terminal: sudo grep "SSH_RATE" /var/log/firewalld
+
+        # Create range for accepted ips
+        sudo firewall-cmd --zone=public --new-ipset=sshrange --type=hash:net 1>/dev/null 2>&1
+        sudo firewall-cmd --zone=public --ipset=sshrange --add-entry=201.191.0.0/16 1>/dev/null 2>&1
+        sudo firewall-cmd --zone=public --ipset=sshrange --add-entry=201.192.0.0/14 1>/dev/null 2>&1
+        sudo firewall-cmd --zone=public --ipset=sshrange --add-entry=201.196.0.0/14 1>/dev/null 2>&1
+        sudo firewall-cmd --zone=public --ipset=sshrange --add-entry=201.200.0.0/13 1>/dev/null 2>&1
+        # Apply rule
+        sudo firewall-cmd --zone=public --add-rich-rule='rule family="ipv4" source ipset="sshrange" service name="ssh" accept' 1>/dev/null 2>&1
+        
+        # Block ICMP (ping)
+        sudo firewall-cmd  --zone=public --add-rich-rule='rule protocol value="icmp" reject' 1>/dev/null 2>&1
+
+        # Block everything not autorized
+        sudo firewall-cmd --zone=public --set-target=DROP --permanent
 
         # Reload firewalld to apply changes
-        sudo firewall-cmd --reload 1>/dev/null 2>&1
-
-        # Limit SSH connections to 5/m
-        sudo firewall-cmd --zone=public --add-rich-rule='rule family="ipv4" service name="ssh" limit value="5/m" accept' --permanent 1>/dev/null 2>&1
-
-        # Block ICMP (ping)
-        # sudo firewall-cmd --zone=public --add-rich-rule='rule family="ipv4" source address="0.0.0.0/0" drop protocol value="icmp"' --permanent 1>/dev/null 2>&1
-
-        # Reload again after optional rules
         sudo firewall-cmd --reload 1>/dev/null 2>&1
         
         # Save configurations permanently
