@@ -52,29 +52,38 @@ install_fail2ban() {
         fi
     fi
 
-    # Copy base configuration
-    sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+    # Paths
+    local SCRIPT_DIR
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    local TEMPLATE_FILE="${SCRIPT_DIR}/jail.local"
+    local JAIL_LOCAL="/etc/fail2ban/jail.local"
+    local TIMESTAMP=$(date +%F_%H%M%S)
 
-    # Write minimal configuration
-    sudo tee /etc/fail2ban/jail.local >/dev/null <<EOF
-[DEFAULT]
-ignoreip = 127.0.0.1/8 ::1
-bantime  = 1h
-findtime = 10m
-maxretry = 5
+    # Verify template exists
+    if [ ! -f "${TEMPLATE_FILE}" ]; then
+        echo -e "${RED}Configuration template not found: ${TEMPLATE_FILE}${NC}"
+        exit 1
+    fi
 
-[sshd]
-enabled = true
-port    = ssh
-logpath = %(sshd_log)s
-EOF
+    # Backup existing configuration
+    if [ -f "${JAIL_LOCAL}" ]; then
+        echo -e "[INFO] Backing up existing ${JAIL_LOCAL} to ${JAIL_LOCAL}.backup.${TIMESTAMP}"
+        sudo cp "${JAIL_LOCAL}" "${JAIL_LOCAL}.backup.${TIMESTAMP}"
+    else
+        echo -e "[WARN] ${JAIL_LOCAL} not found, backing up default /etc/fail2ban/jail.conf"
+        sudo cp /etc/fail2ban/jail.conf "/etc/fail2ban/jail.conf.backup.${TIMESTAMP}"
+    fi
+
+    # Copy provided configuration
+    echo -e "[INFO] Deploying configuration from ${TEMPLATE_FILE} to ${JAIL_LOCAL}"
+    sudo cp "${TEMPLATE_FILE}" "${JAIL_LOCAL}"
 
     echo -e "${GREEN}[INFO] jail.local creado con parámetros básicos.${NC}"
 
-    # Restart service
+    # Enable and restart Fail2Ban service
     sudo systemctl enable fail2ban >/dev/null 2>&1
     sudo systemctl restart fail2ban >/dev/null 2>&1
-    echo -e "${GREEN}[OK] Fail2Ban iniciado y configurado.${NC}"
+    echo -e "${GREEN}[OK] Fail2Ban service started and configured.${NC}"
     sudo systemctl status fail2ban --no-pager
     echo ""
     

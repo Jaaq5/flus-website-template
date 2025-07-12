@@ -101,23 +101,31 @@ install_firewall() {
         echo "Permitiendo SSH, HTTP y HTTPS..."
 
         # Allow SSH, HTTP, and HTTPS traffic
-        sudo firewall-cmd --zone=public --add-service=ssh 1>/dev/null 2>&1
+        #sudo firewall-cmd --zone=public --add-service=ssh 1>/dev/null 2>&1
+        sudo firewall-cmd --zone=public --remove-service=ssh 1>/dev/null 2>&1 || true
+        sudo firewall-cmd --zone=public --add-port=${SSH_PORT}/tcp 1>/dev/null 2>&1
         sudo firewall-cmd --zone=public --add-service=http 1>/dev/null 2>&1
         sudo firewall-cmd --zone=public --add-service=https 1>/dev/null 2>&1
 
-        # Limit SSH connections to 2/m and save log
-        sudo firewall-cmd --zone=public --add-rich-rule='rule service name="ssh" limit value="2/m" log prefix="SSH_RATE" level="notice" accept' 1>/dev/null 2>&1
-        # Run in terminal: sudo grep "SSH_RATE" /var/log/firewalld
+        # Limit SSH connections to 2 per minute and log attempts
+        sudo firewall-cmd --zone=public \
+            --add-rich-rule="rule port port=${SSH_PORT} protocol=tcp limit value=\"2/m\" log prefix=\"SSH_RATE\" level=\"notice\" accept"
 
-        # Create range for accepted ips
-        sudo firewall-cmd --zone=public --new-ipset=sshrange --type=hash:net 1>/dev/null 2>&1
-        sudo firewall-cmd --zone=public --ipset=sshrange --add-entry=201.191.0.0/16 1>/dev/null 2>&1
-        sudo firewall-cmd --zone=public --ipset=sshrange --add-entry=201.192.0.0/14 1>/dev/null 2>&1
-        sudo firewall-cmd --zone=public --ipset=sshrange --add-entry=201.196.0.0/14 1>/dev/null 2>&1
-        sudo firewall-cmd --zone=public --ipset=sshrange --add-entry=201.200.0.0/13 1>/dev/null 2>&1
-        # Apply rule
-        sudo firewall-cmd --zone=public --add-rich-rule='rule family="ipv4" source ipset="sshrange" service name="ssh" accept' 1>/dev/null 2>&1
-        
+        # Create an ipset for allowed IP ranges
+        sudo firewall-cmd --zone=public --new-ipset=sshrange --type=hash:net
+        for net in \
+            201.191.0.0/16 \
+            201.192.0.0/14 \
+            201.196.0.0/14 \
+            201.200.0.0/13
+        do
+            sudo firewall-cmd --zone=public --ipset=sshrange --add-entry="${net}"
+        done
+
+        # Allow only those IP ranges on the dynamic SSH port
+        sudo firewall-cmd --zone=public \
+            --add-rich-rule="rule family=\"ipv4\" source ipset=\"sshrange\" port port=${SSH_PORT} protocol=tcp accept"
+
         # Block ICMP (ping)
         sudo firewall-cmd  --zone=public --add-rich-rule='rule protocol value="icmp" drop' 1>/dev/null 2>&1
 
@@ -135,86 +143,53 @@ install_firewall() {
 }
 
 #######################################
-# Configures the sshd_config file to enhance security.
+# Configures the sshd_config file by backing up and replacing it.
 # Arguments:
 #   None
 # Outputs:
-#   Updates the sshd_config file with secure settings.
+#   Creates a .backup of the current sshd_config and replaces it.
 # Returns:
 #   None.
 #######################################
 configure_sshd_config() {
     echo -e "Verificando configuración de sshd_config..."
 
-    # File location
-    SSHD_CONFIG="/etc/ssh/sshd_config"
+    local SSHD_CONFIG="/etc/ssh/sshd_config"
+    local SCRIPT_DIR
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    local NEW_CONFIG="${SCRIPT_DIR}/sshd_config"
 
-    # Check if the file exists
-    if [ ! -f "$SSHD_CONFIG" ]; then
-        echo -e "${RED}El archivo $SSHD_CONFIG no existe.${NC}\n"
+    # Check if original exists
+    if [ ! -f "${SSHD_CONFIG}" ]; then
+        echo -e "${RED}El archivo ${SSHD_CONFIG} no existe.${NC}\n"
         exit 1
     fi
 
-    # Ensure PasswordAuthentication is set to "no"
-    if ! grep -q "^PasswordAuthentication no" "$SSHD_CONFIG"; then
-        echo "Desactivando autenticación por contraseña..."
-        sudo sed -i '/^#PasswordAuthentication yes/s/^#//' "$SSHD_CONFIG"
-        sudo sed -i 's/^PasswordAuthentication .*/PasswordAuthentication no/' "$SSHD_CONFIG"
+    echo "Creando copia de seguridad: ${SSHD_CONFIG}.backup"
+    sudo cp "${SSHD_CONFIG}" "${SSHD_CONFIG}.backup"
+
+    if [ ! -f "${NEW_CONFIG}" ]; then
+        echo -e "${RED}No se encontró el archivo de reemplazo: ${NEW_CONFIG}.${NC}\n"
+        exit 1
     fi
 
-    # Ensure PermitRootLogin is set to "prohibit-password"
-    if ! grep -q "^PermitRootLogin prohibit-password" "$SSHD_CONFIG"; then
-        echo "Desactivando acceso como root por contraseña..."
-        sudo sed -i '/^#PermitRootLogin/s/^#//' "$SSHD_CONFIG"
-        sudo sed -i 's/^PermitRootLogin .*/PermitRootLogin prohibit-password/' "$SSHD_CONFIG"
-    fi
+    echo "Reemplazando ${SSHD_CONFIG} con ${NEW_CONFIG}..."
+    sudo cp "${NEW_CONFIG}" "${SSHD_CONFIG}"
 
-    # Ensure KbdInteractiveAuthentication is set to "no"
-    if ! grep -q "^KbdInteractiveAuthentication no" "$SSHD_CONFIG"; then
-        echo "Desactivando autenticación interactiva..."
-        sudo sed -i '/^#KbdInteractiveAuthentication yes/s/^#//' "$SSHD_CONFIG"
-        sudo sed -i 's/^KbdInteractiveAuthentication .*/KbdInteractiveAuthentication no/' "$SSHD_CONFIG"
+    # Check if Port is set in sshd_config
+    if grep -qE '^Port ' "${SSHD_CONFIG}"; then
+      sudo sed -i "s/^Port .*/Port ${SSH_PORT}/" "${SSHD_CONFIG}"
+    else
+      sudo sed -i "1a Port ${SSH_PORT}" "${SSHD_CONFIG}"
     fi
+    sudo systemctl daemon-reload 1>/dev/null 2>&1
+    sudo systemctl restart ssh.service 1>/dev/null 2>&1
 
-    # Ensure PubkeyAuthentication is set to "yes"
-    if ! grep -q "^PubkeyAuthentication yes" "$SSHD_CONFIG"; then
-        echo "Habilitando autenticación por clave pública..."
-        sudo sed -i '/^#PubkeyAuthentication yes/s/^#//' "$SSHD_CONFIG"
-        sudo sed -i 's/^PubkeyAuthentication .*/PubkeyAuthentication yes/' "$SSHD_CONFIG"
-    fi
-
-    # Set MaxAuthTries to 5
-    if ! grep -q "^MaxAuthTries 5" "$SSHD_CONFIG"; then
-        echo "Estableciendo MaxAuthTries a 5..."
-        sudo sed -i '/^#MaxAuthTries.*/s/^#//' "$SSHD_CONFIG"
-        sudo sed -i 's/^MaxAuthTries .*/MaxAuthTries 5/' "$SSHD_CONFIG"
-    fi
-
-    # Set MaxSessions to 5
-    if ! grep -q "^MaxSessions 5" "$SSHD_CONFIG"; then
-        echo "Estableciendo MaxSessions a 5..."
-        sudo sed -i '/^#MaxSessions.*/s/^#//' "$SSHD_CONFIG"
-        sudo sed -i 's/^MaxSessions .*/MaxSessions 5/' "$SSHD_CONFIG"
-    fi
-
-    # Set ClientAliveInterval to 600 (10 minutes)
-    if ! grep -q "^ClientAliveInterval 600" "$SSHD_CONFIG"; then
-        echo "Estableciendo ClientAliveInterval a 600 segundos..."
-        sudo sed -i '/^#ClientAliveInterval.*/s/^#//' "$SSHD_CONFIG"
-        sudo sed -i 's/^ClientAliveInterval .*/ClientAliveInterval 600/' "$SSHD_CONFIG"
-    fi
-
-    # Set ClientAliveCountMax to 0
-    if ! grep -q "^ClientAliveCountMax 0" "$SSHD_CONFIG"; then
-        echo "Estableciendo ClientAliveCountMax a 0..."
-        sudo sed -i '/^#ClientAliveCountMax.*/s/^#//' "$SSHD_CONFIG"
-        sudo sed -i 's/^ClientAliveCountMax .*/ClientAliveCountMax 0/' "$SSHD_CONFIG"
-    fi
-
-    # Restart SSH service to apply changes
-    echo -e "Reiniciando servicio SSH..."
-    sudo systemctl restart ssh
+    echo -e "${GREEN}sshd_config reemplazado y SSH reiniciado correctamente.${NC}"
+    sudo systemctl status ssh.service --no-pager
+    echo ""
 }
+
 
 #######################################
 # Main entry point for the script.
@@ -227,6 +202,15 @@ configure_sshd_config() {
 #######################################
 main() {
   echo -e "${ORANGE}🧱 Iniciando configuración de firewall...${NC}"
+
+  if [ -f "$(dirname "${BASH_SOURCE[0]}")/.env" ]; then
+    set -o allexport
+    source "$(dirname "${BASH_SOURCE[0]}")/.env"
+    set +o allexport
+  else
+    echo "${ORANGE}No se encontró .env — usando puerto por defecto 22${NC}"
+    SSH_PORT=${SSH_PORT:-22}
+  fi
 
   # Purge any existing firewalls (UFW, iptables)
   purge_firewall

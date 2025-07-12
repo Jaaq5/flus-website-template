@@ -1,0 +1,43 @@
+# Fail2Ban basic configuration file
+# For more details see 'man fail2ban' or online documentation
+
+[DEFAULT]
+# List of IPs and networks to ignore when banning
+# Can be an IP address, CIDR mask, or DNS host
+ignoreip = 127.0.0.1/8 ::1
+
+# Duration (in seconds) that a host is banned
+bantime  = 3600
+
+# Window of time (in seconds) to count failures
+findtime = 600
+
+# Number of failures before a ban is applied
+maxretry = 5
+
+# Backend to use for log monitoring: systemd or polling
+backend = systemd
+
+[sshd]
+# Enable the SSH jail
+enabled  = true
+
+# Port for SSH service; matches /etc/ssh/sshd_config
+port     = ssh
+
+# Log path for SSH authentication events
+logpath  = %(sshd_log)s
+
+# Optional: send email when a ban occurs (uncomment and configure)
+# action = %(action_mwl)s
+
+# Customize failregex or add additional filters if needed
+# failregex = ^%(__prefix_line)s(?:error: PAM: )?Authentication failure for .* from <HOST>
+
+# Additional jails can be defined below
+# [nginx-http-auth]
+# enabled = true
+# port    = http,https
+# filter  = nginx-http-auth
+# logpath = /var/log/nginx/error.log
+# maxretry = 3
