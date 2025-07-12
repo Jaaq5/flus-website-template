@@ -183,13 +183,6 @@ configure_sshd_config() {
         sudo sed -i 's/^PubkeyAuthentication .*/PubkeyAuthentication yes/' "$SSHD_CONFIG"
     fi
 
-    # Disable PAM authentication
-    if ! grep -q "^UsePAM no" "$SSHD_CONFIG"; then
-        echo "Desactivando autenticación PAM..."
-        sudo sed -i '/^#UsePAM yes/s/^#//' "$SSHD_CONFIG"
-        sudo sed -i 's/^UsePAM .*/UsePAM no/' "$SSHD_CONFIG"
-    fi
-
     # Set MaxAuthTries to 5
     if ! grep -q "^MaxAuthTries 5" "$SSHD_CONFIG"; then
         echo "Estableciendo MaxAuthTries a 5..."
@@ -220,7 +213,7 @@ configure_sshd_config() {
 
     # Restart SSH service to apply changes
     echo -e "Reiniciando servicio SSH..."
-    sudo systemctl restart sshd
+    sudo systemctl restart ssh
 }
 
 #######################################
