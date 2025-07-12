@@ -10,12 +10,6 @@
 # Exit on error, unset variable, or pipeline failure
 set -euo pipefail  
 
-# Color codes for terminal output
-GREEN='\033[0;32m'   # Success
-ORANGE='\033[0;33m'  # Info/warning
-RED='\033[0;31m'     # Error
-NC='\033[0m'         # No color (reset)
-
 #######################################
 # Checks if a command exists on the system.
 # Arguments:
@@ -49,7 +43,7 @@ purge_firewall() {
   
     # Flush iptables if installed
     if command_exists iptables; then
-        echo "Desinstalando iptables..."
+        echo "Limpiando reglas de iptables..."
         sudo iptables -F 1>/dev/null 2>&1
         sudo iptables -t nat -F 1>/dev/null 2>&1
         sudo iptables -t mangle -F 1>/dev/null 2>&1
@@ -61,8 +55,7 @@ purge_firewall() {
             sudo iptables-save | sudo tee /etc/iptables/rules.v4 >/dev/null || true
         fi
 
-        sudo apt-get purge -y iptables 1>/dev/null 2>&1 || true
-        echo -e "iptables desinstalado correctamente"
+        echo -e "Reglas de iptables restablecidas  correctamente"
     fi
 }
 
@@ -79,7 +72,7 @@ install_firewall() {
     echo -e "Verificando e instalando firewalld..."
 
     # Check if firewalld is installed
-    if command_exists firewalld; then
+    if command_exists firewall-cmd; then
         echo -e "${ORANGE}firewalld ya está instalado.${NC}\n"
         return 0
     else
@@ -120,10 +113,10 @@ install_firewall() {
         sudo firewall-cmd --zone=public --add-rich-rule='rule family="ipv4" source ipset="sshrange" service name="ssh" accept' 1>/dev/null 2>&1
         
         # Block ICMP (ping)
-        sudo firewall-cmd  --zone=public --add-rich-rule='rule protocol value="icmp" reject' 1>/dev/null 2>&1
+        sudo firewall-cmd  --zone=public --add-rich-rule='rule protocol value="icmp" drop' 1>/dev/null 2>&1
 
         # Block everything not autorized
-        sudo firewall-cmd --zone=public --set-target=DROP --permanent
+        sudo firewall-cmd --zone=public --set-target=DROP 1>/dev/null 2>&1
 
         # Reload firewalld to apply changes
         sudo firewall-cmd --reload 1>/dev/null 2>&1

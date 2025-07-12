@@ -79,6 +79,7 @@ main() {
   run_script "./install_bat.sh"
   run_script "./configure_terminal.sh"
   run_script "./configure_firewall.sh"
+  run_script "./install_fail2ban.sh"
 
 
   echo -e "${GREEN}✅ ¡Configuración de producción finalizada!${NC}"
