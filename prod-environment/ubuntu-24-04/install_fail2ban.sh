@@ -12,7 +12,7 @@ set -euo pipefail
 
 # Color codes for terminal output
 GREEN='\033[0;32m'   # Success
-ORANGE='\033[0;33m'  # Info/warning
+ORANGE='\033[0;33m'  # Warning
 RED='\033[0;31m'     # Error
 NC='\033[0m'         # No color (reset)
 
@@ -50,7 +50,7 @@ install_fail2ban() {
             echo -e "${RED}Error al instalar Fail2Ban.${NC}" >&2
             exit 1
         fi
-        
+
     # Copy base configuration
     sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
 
