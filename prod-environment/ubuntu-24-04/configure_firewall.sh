@@ -135,6 +135,95 @@ install_firewall() {
 }
 
 #######################################
+# Configures the sshd_config file to enhance security.
+# Arguments:
+#   None
+# Outputs:
+#   Updates the sshd_config file with secure settings.
+# Returns:
+#   None.
+#######################################
+configure_sshd_config() {
+    echo -e "Verificando configuración de sshd_config..."
+
+    # File location
+    SSHD_CONFIG="/etc/ssh/sshd_config"
+
+    # Check if the file exists
+    if [ ! -f "$SSHD_CONFIG" ]; then
+        echo -e "${RED}El archivo $SSHD_CONFIG no existe.${NC}\n"
+        exit 1
+    fi
+
+    # Ensure PasswordAuthentication is set to "no"
+    if ! grep -q "^PasswordAuthentication no" "$SSHD_CONFIG"; then
+        echo "Desactivando autenticación por contraseña..."
+        sudo sed -i '/^#PasswordAuthentication yes/s/^#//' "$SSHD_CONFIG"
+        sudo sed -i 's/^PasswordAuthentication .*/PasswordAuthentication no/' "$SSHD_CONFIG"
+    fi
+
+    # Ensure PermitRootLogin is set to "prohibit-password"
+    if ! grep -q "^PermitRootLogin prohibit-password" "$SSHD_CONFIG"; then
+        echo "Desactivando acceso como root por contraseña..."
+        sudo sed -i '/^#PermitRootLogin/s/^#//' "$SSHD_CONFIG"
+        sudo sed -i 's/^PermitRootLogin .*/PermitRootLogin prohibit-password/' "$SSHD_CONFIG"
+    fi
+
+    # Ensure KbdInteractiveAuthentication is set to "no"
+    if ! grep -q "^KbdInteractiveAuthentication no" "$SSHD_CONFIG"; then
+        echo "Desactivando autenticación interactiva..."
+        sudo sed -i '/^#KbdInteractiveAuthentication yes/s/^#//' "$SSHD_CONFIG"
+        sudo sed -i 's/^KbdInteractiveAuthentication .*/KbdInteractiveAuthentication no/' "$SSHD_CONFIG"
+    fi
+
+    # Ensure PubkeyAuthentication is set to "yes"
+    if ! grep -q "^PubkeyAuthentication yes" "$SSHD_CONFIG"; then
+        echo "Habilitando autenticación por clave pública..."
+        sudo sed -i '/^#PubkeyAuthentication yes/s/^#//' "$SSHD_CONFIG"
+        sudo sed -i 's/^PubkeyAuthentication .*/PubkeyAuthentication yes/' "$SSHD_CONFIG"
+    fi
+
+    # Disable PAM authentication
+    if ! grep -q "^UsePAM no" "$SSHD_CONFIG"; then
+        echo "Desactivando autenticación PAM..."
+        sudo sed -i '/^#UsePAM yes/s/^#//' "$SSHD_CONFIG"
+        sudo sed -i 's/^UsePAM .*/UsePAM no/' "$SSHD_CONFIG"
+    fi
+
+    # Set MaxAuthTries to 5
+    if ! grep -q "^MaxAuthTries 5" "$SSHD_CONFIG"; then
+        echo "Estableciendo MaxAuthTries a 5..."
+        sudo sed -i '/^#MaxAuthTries.*/s/^#//' "$SSHD_CONFIG"
+        sudo sed -i 's/^MaxAuthTries .*/MaxAuthTries 5/' "$SSHD_CONFIG"
+    fi
+
+    # Set MaxSessions to 5
+    if ! grep -q "^MaxSessions 5" "$SSHD_CONFIG"; then
+        echo "Estableciendo MaxSessions a 5..."
+        sudo sed -i '/^#MaxSessions.*/s/^#//' "$SSHD_CONFIG"
+        sudo sed -i 's/^MaxSessions .*/MaxSessions 5/' "$SSHD_CONFIG"
+    fi
+
+    # Set ClientAliveInterval to 600 (10 minutes)
+    if ! grep -q "^ClientAliveInterval 600" "$SSHD_CONFIG"; then
+        echo "Estableciendo ClientAliveInterval a 600 segundos..."
+        sudo sed -i '/^#ClientAliveInterval.*/s/^#//' "$SSHD_CONFIG"
+        sudo sed -i 's/^ClientAliveInterval .*/ClientAliveInterval 600/' "$SSHD_CONFIG"
+    fi
+
+    # Set ClientAliveCountMax to 0
+    if ! grep -q "^ClientAliveCountMax 0" "$SSHD_CONFIG"; then
+        echo "Estableciendo ClientAliveCountMax a 0..."
+        sudo sed -i '/^#ClientAliveCountMax.*/s/^#//' "$SSHD_CONFIG"
+        sudo sed -i 's/^ClientAliveCountMax .*/ClientAliveCountMax 0/' "$SSHD_CONFIG"
+    fi
+
+    # Restart SSH service to apply changes
+    echo -e "Reiniciando servicio SSH..."
+    sudo systemctl restart sshd
+}
+
+#######################################
 # Main entry point for the script.
 # Arguments:
 #   None
@@ -151,6 +240,9 @@ main() {
   
   # Install and configure firewalld with basic rules
   install_firewall
+
+   # Configure sshd_config for secure settings
+   configure_sshd_config
 }
 
 # Execute the main function

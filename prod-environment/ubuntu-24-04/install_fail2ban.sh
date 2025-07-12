@@ -44,12 +44,13 @@ install_fail2ban() {
         echo -e "${ORANGE}Fail2Ban ya está instalado.${NC}\n"
         return 0
     else
-        # Install firewalld
+        # Install Fail2Ban
         sudo NEEDRESTART_SUSPEND=1 apt-get install -y -qq fail2ban 1>/dev/null
         if [[ $? -ne 0 ]]; then
             echo -e "${RED}Error al instalar Fail2Ban.${NC}" >&2
             exit 1
         fi
+    fi
 
     # Copy base configuration
     sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
