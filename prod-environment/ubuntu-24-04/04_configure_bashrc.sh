@@ -44,7 +44,7 @@ err() {
 #######################################
 configure_bashrc() {
   local template_dir="./files-templates"
-  local template_file=".bashrc.sh"
+  local template_file=".bashrc"
   local src="${template_dir}/${template_file}"
   local dest="$HOME/.bashrc"
   local backup="${dest}.backup"
