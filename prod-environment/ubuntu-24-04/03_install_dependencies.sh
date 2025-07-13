@@ -1,0 +1,109 @@
+#!/bin/bash
+# Style guide: https://google.github.io/styleguide/shellguide.html
+#
+# 03_install_dependencies.sh
+# Purpose: Verify and install required system dependencies.
+# Usage: ./03_install_dependencies.sh
+# Dependencies: sudo, apt-get, dpkg-query
+
+# Exit on error, unset variable, or pipeline failure
+set -euo pipefail
+
+# Constants for colored output
+readonly GREEN='\033[0;32m'  # Success
+readonly ORANGE='\033[0;33m' # Info/warning
+readonly RED='\033[0;31m'    # Error
+readonly NC='\033[0m'        # No color (reset)
+
+# List of required packages
+readonly PACKAGES=(curl make gawk vim nano)
+
+#######################################
+# Print an error message to STDERR with timestamp and color.
+# Globals:
+#   RED
+#   NC
+# Arguments:
+#   $*: Error message.
+# Outputs:
+#   Formatted message to STDERR.
+#######################################
+err() {
+  echo -e "${RED}[$(date +'%Y-%m-%dT%H:%M:%S%z')]: $*${NC}" >&2
+}
+
+#######################################
+# Check if a package is installed.
+# Globals:
+#   None
+# Arguments:
+#   $1 - package name.
+# Returns:
+#   0 if installed, non-zero otherwise.
+#######################################
+is_installed() {
+  dpkg-query -Wf='${db:Status-abbrev}' "$1" 2>/dev/null | grep -q '^i'
+}
+
+#######################################
+# Install a package using apt-get.
+# Globals:
+#   None
+# Arguments:
+#   $1 - package name
+# Outputs:
+#   Informational and/or error messages
+# Returns:
+#   Exits non-zero on failure
+#######################################
+install_pkg() {
+  local pkg="$1"
+  echo -e "Installing package: ${pkg}..."
+  if ! sudo apt-get install -y -qq "$pkg"; then
+    err "Failed to install package: ${pkg}"
+    exit 1
+  fi
+  echo -e "${GREEN}Package ${pkg} installed successfully.${NC}"
+}
+
+#######################################
+# Verify and install missing dependencies.
+# Globals:
+#   PACKAGES
+# Arguments:
+#   None
+# Outputs:
+#   Status messages to STDOUT/STDERR.
+# Returns:
+#   Exits non-zero on any install failure.
+#######################################
+check_and_install_dependencies() {
+  for pkg in "${PACKAGES[@]}"; do
+    if is_installed "$pkg"; then
+      echo -e "${ORANGE}Already installed: ${pkg}${NC}"
+    else
+      install_pkg "$pkg"
+    fi
+  done
+  echo -e "${GREEN}✅ All dependencies are now satisfied.${NC}\n"
+}
+
+#######################################
+# Main entry point.
+# Globals:
+#   None
+# Arguments:
+#   None
+# Outputs:
+#   Summary messages to STDOUT/STDERR.
+# Returns:
+#   None; exits on failure.
+#######################################
+main() {
+  clear
+  echo -e "${ORANGE}🔧 Verifying and installing dependencies...${NC}"
+  check_and_install_dependencies
+}
+
+# Execute main function
+main "$@"
