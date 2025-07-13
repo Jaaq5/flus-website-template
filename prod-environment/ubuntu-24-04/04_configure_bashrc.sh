@@ -69,7 +69,7 @@ configure_bashrc() {
   # shellcheck source=/dev/null
   source "$dest"
 
-  echo -e "${GREEN}✅ .bashrc configured successfully!${NC}"
+  echo -e "${GREEN}✅ .bashrc configured successfully!${NC}\n"
 }
 
 #######################################

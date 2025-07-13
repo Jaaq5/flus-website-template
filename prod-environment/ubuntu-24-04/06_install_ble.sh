@@ -55,7 +55,10 @@ install_ble() {
 
   # Clone the ble.sh repository
   echo "Cloning ble.sh repository..."
-  if ! git clone --recursive https://github.com/akinomyoga/ble.sh.git ~/.local/src/ble.sh >/dev/null 2>&1; then
+  if
+    ! git clone --recursive https://github.com/akinomyoga/ble.sh.git \
+      ~/.local/src/ble.sh >/dev/null 2>&1
+  then
     err "Failed to clone ble.sh repository."
     exit 1
   fi

@@ -57,7 +57,8 @@ install_starship() {
   mkdir -p "$bin_dir"
 
   # Download and install
-  if ! curl -fsSL https://starship.rs/install.sh | sh -s -- --bin-dir "$bin_dir" --yes; then
+  if ! curl -fsSL https://starship.rs/install.sh |
+    sh -s -- --bin-dir "$bin_dir" --yes >/dev/null 2>&1; then
     err "Installation of Starship failed."
     exit 1
   fi
