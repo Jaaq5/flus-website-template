@@ -32,7 +32,9 @@ err() {
 #######################################
 # Ensure the system timezone is set to America/Costa_Rica.
 # Globals:
-#   None
+#   ORANGE
+#   GREEN
+#   NC
 # Arguments:
 #   None
 # Outputs:
@@ -73,7 +75,8 @@ configure_timezone() {
 #######################################
 # Main entry point.
 # Globals:
-#   None
+#   ORANGE
+#   NC
 # Arguments:
 #   None
 # Outputs:

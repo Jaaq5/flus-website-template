@@ -26,13 +26,15 @@ readonly NC='\033[0m'        # No color (reset)
 #   Formatted message to STDERR.
 #######################################
 err() {
-    echo -e "${RED}[$(date +'%Y-%m-%dT%H:%M:%S%z')]: $*${NC}" >&2
+  echo -e "${RED}[$(date +'%Y-%m-%dT%H:%M:%S%z')]: $*${NC}" >&2
 }
 
 #######################################
 # Backup ~/.bashrc and install new template.
 # Globals:
-#   None
+#   ORANGE
+#   GREEN
+#   NC
 # Arguments:
 #   None
 # Outputs:
@@ -41,47 +43,48 @@ err() {
 #   Exits non-zero on failure.
 #######################################
 configure_bashrc() {
-    local template_dir="./files-templates"
-    local template_file=".bashrc.sh"
-    local src="${template_dir}/${template_file}"
-    local dest="$HOME/.bashrc"
-    local backup="${dest}.backup"
+  local template_dir="./files-templates"
+  local template_file=".bashrc.sh"
+  local src="${template_dir}/${template_file}"
+  local dest="$HOME/.bashrc"
+  local backup="${dest}.backup"
 
-    echo -e "Checking for template file at ${src}..."
-    if [[ ! -f "$src" ]]; then
-        err "Template file '${src}' not found."
-        exit 1
-    fi
+  echo -e "Checking for template file at ${src}..."
+  if [[ ! -f "$src" ]]; then
+    err "Template file '${src}' not found."
+    exit 1
+  fi
 
-    echo -e "Backing up existing .bashrc to ${backup}..."
-    if [[ -f "$dest" ]]; then
-        cp "$dest" "$backup"
-    else
-        echo -e "${ORANGE}No existing ~/.bashrc found; skipping backup.${NC}"
-    fi
+  echo -e "Backing up existing .bashrc to ${backup}..."
+  if [[ -f "$dest" ]]; then
+    cp "$dest" "$backup"
+  else
+    echo -e "${ORANGE}No existing ~/.bashrc found; skipping backup.${NC}"
+  fi
 
-    echo -e "Installing new .bashrc from template..."
-    cp "$src" "$dest"
+  echo -e "Installing new .bashrc from template..."
+  cp "$src" "$dest"
 
-    echo -e "Sourcing updated .bashrc..."
-    # shellcheck source=/dev/null
-    source "$dest"
+  echo -e "Sourcing updated .bashrc..."
+  # shellcheck source=/dev/null
+  source "$dest"
 
-    echo -e "${GREEN}✅ .bashrc configured successfully!${NC}"
+  echo -e "${GREEN}✅ .bashrc configured successfully!${NC}"
 }
 
 #######################################
 # Main entry point.
 # Globals:
-#   None
+#   ORANGE
+#   NC
 # Arguments:
 #   None
 # Outputs:
 #   Startup message to STDOUT.
 #######################################
 main() {
-    echo -e "${ORANGE}⚙️ Configuring ~/.bashrc from template...${NC}"
-    configure_bashrc
+  echo -e "${ORANGE}⚙️ Configuring ~/.bashrc from template...${NC}"
+  configure_bashrc
 }
 
 # Execute main function

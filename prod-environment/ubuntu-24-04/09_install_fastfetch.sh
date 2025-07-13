@@ -1,10 +1,10 @@
 #!/bin/bash
 # Style guide: https://google.github.io/styleguide/shellguide.html
 #
-# 05_install_starship.sh
-# Purpose: Verify and install Starship shell prompt.
-# Usage: ./05_install_starship.sh
-# Dependencies: bash, curl
+# 09_install_fastfetch.sh
+# Purpose: Verify and install the 'fastfetch' system information tool.
+# Usage: ./09_install_fastfetch.sh
+# Dependencies: sudo, apt-get
 
 # Exit on error, unset variable, or pipeline failure
 set -euo pipefail
@@ -30,39 +30,36 @@ err() {
 }
 
 #######################################
-# Install Starship shell prompt in ~/.local/bin if not installed.
+# Install 'fastfetch' package.
 # Globals:
 #   ORANGE
 #   GREEN
+#   RED
 #   NC
 # Arguments:
 #   None
 # Outputs:
-#   Progress messages to STDOUT/STDERR
+#   Progress messages to STDOUT.
 # Returns:
-#   Exits non-zero on failure
+#   Exits with error if installation fails.
 #######################################
-install_starship() {
-  echo -e "Checking for Starship installation..."
+install_fastfetch() {
+  echo -e "Checking for fastfetch installation..."
 
-  if command -v starship >/dev/null 2>&1; then
-    echo -e "${ORANGE}Starship is already installed.${NC}\n"
+  if command -v fastfetch >/dev/null 2>&1; then
+    echo -e "${ORANGE}fastfetch is already installed.${NC}\n"
     return 0
   fi
 
-  echo -e "Installing Starship..."
+  echo -e "Installing fastfetch..."
 
-  # Ensure local bin directory exists
-  local bin_dir="$HOME/.local/bin"
-  mkdir -p "$bin_dir"
-
-  # Download and install
-  if ! curl -fsSL https://starship.rs/install.sh | sh -s -- --bin-dir "$bin_dir" --yes; then
-    err "Installation of Starship failed."
+  # Install fastfetch
+  if ! sudo apt-get install -y -qq fastfetch >/dev/null; then
+    err "Failed to install fastfetch."
     exit 1
   fi
 
-  echo -e "${GREEN}✅ Starship installed successfully in ${bin_dir}.${NC}\n"
+  echo -e "${GREEN}✅ fastfetch installed successfully!${NC}\n"
 }
 
 #######################################
@@ -73,14 +70,13 @@ install_starship() {
 # Arguments:
 #   None
 # Outputs:
-#   Summary message to STDOUT
+#   Summary message.
 # Returns:
-#   None; exits on failure
+#   None; exits on any error.
 #######################################
 main() {
-  echo -e "${ORANGE}🚀 Verifying and installing Starship...${NC}"
-  install_starship
+  echo -e "${ORANGE}🔧 Verifying and installing fastfetch...${NC}"
+  install_fastfetch
 }
 
-# Execute main function
 main "$@"

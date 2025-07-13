@@ -4,20 +4,28 @@
 # menu.sh
 # Purpose: Menu interface to run specific system scripts.
 # Usage: ./menu.sh
-# Dependencies: bash, chmod, clear, read, ./01_update_system.sh
+# Dependencies: bash, chmod, clear, read, sleep
+#               ./01_update_system.sh
 #               ./02_configure_timezone.sh
+#               ./03_install_dependencies.sh
+#               ./04_configure_bashrc.sh
+#               ./05_install_starship.sh
+#               ./06_install_ble.sh
+#               ./07_install_lsd.sh
+#               ./08_install_bat.sh
+#               ./09_install_fastfetch.sh
 
 # Exit on error, unset variable, or pipeline failure
 set -euo pipefail
 
 # Constants for colored output
 readonly GREEN='\033[0;32m'  # Success
-readonly ORANGE='\033[0;33m' # Warning
+readonly ORANGE='\033[0;33m' # Info/warning
 readonly RED='\033[0;31m'    # Error
 readonly NC='\033[0m'        # No color (reset)
 
 #######################################
-# Print an error message to STDERR with timestamp.
+# Print an error message to STDERR with timestamp and color.
 # Globals:
 #   RED
 #   NC
@@ -33,41 +41,40 @@ err() {
 #######################################
 # Display the menu options.
 # Globals:
-#   None
+#   ORANGE
+#   NC
 # Arguments:
 #   None
 # Outputs:
 #   Menu to STDOUT.
 #######################################
 show_menu() {
-  echo -e "${ORANGE}========= MENU =========${NC}"
+  echo -e "${ORANGE}========= SYSTEM SETUP MENU =========${NC}"
   echo "1) Exit"
-  echo "2) Update system"
-  echo "======================="
+  echo "2) Update System"
+  echo "3) Configure Timezone"
+  echo "4) Install Dependencies (curl, make, etc.)"
+  echo "5) Configure .bashrc"
+  echo "6) Install Starship Prompt"
+  echo "7) Install ble.sh Editor"
+  echo "8) Install lsd (ls replacement)"
+  echo "9) Install bat (cat replacement)"
+  echo "10) Install fastfetch (system info)"
+  echo -e "${ORANGE}=====================================${NC}"
   echo -n "Select an option: "
 }
 
 #######################################
-# Run the system update script.
+# Pause and wait for 'q' key press.
 # Globals:
 #   GREEN
 #   NC
 # Arguments:
 #   None
 # Outputs:
-#   Execution messages to STDOUT/STDERR.
+#   Prompt to STDOUT.
 #######################################
-run_update_system() {
-  local script="./01_update_system.sh"
-
-  if [[ ! -f "$script" ]]; then
-    err "The file '$script' does not exist."
-    exit 1
-  fi
-
-  chmod +x "$script"
-  #"$script"
-
+press_q_to_continue() {
   echo -e "${GREEN}Press 'q' to return to the menu.${NC}"
   local input
   while true; do
@@ -79,13 +86,52 @@ run_update_system() {
 }
 
 #######################################
+# Generic function to run a script.
+# Globals:
+#   ORANGE
+#   NC
+# Arguments:
+#   $1: Path to the script to run.
+# Outputs:
+#   Execution messages to STDOUT/STDERR.
+# Returns:
+#   Exits on script execution failure.
+#######################################
+run_script() {
+  local script_path="$1"
+  clear # Clear screen before running script
+
+  if [[ ! -f "$script_path" ]]; then
+    err "The script file '$script_path' does not exist."
+    exit 1
+  fi
+
+  # Ensure the script is executable
+  if ! chmod +x "$script_path"; then
+    err "Failed to make '$script_path' executable."
+    exit 1
+  fi
+
+  # Execute the script
+  echo -e "${ORANGE}--- Running ${script_path##*/} ---${NC}"
+  "$script_path"
+  echo -e "${ORANGE}--- Finished ${script_path##*/} ---${NC}"
+  press_q_to_continue
+}
+
+#######################################
 # Main menu loop.
 # Globals:
-#   None
+#   GREEN
+#   ORANGE
+#   RED
+#   NC
 # Arguments:
 #   None
 # Outputs:
 #   Interactive shell menu
+# Returns:
+#   None; exits on option 1.
 #######################################
 main() {
   while true; do
@@ -94,18 +140,42 @@ main() {
     read -r option
     case "$option" in
     1)
-      echo -e "${GREEN}Exiting...${NC}"
+      echo -e "${GREEN}Exiting... Goodbye!${NC}"
       exit 0
       ;;
     2)
-      run_update_system
+      run_script "./01_update_system.sh"
+      ;;
+    3)
+      run_script "./02_configure_timezone.sh"
+      ;;
+    4)
+      run_script "./03_install_dependencies.sh"
+      ;;
+    5)
+      run_script "./04_configure_bashrc.sh"
+      ;;
+    6)
+      run_script "./05_install_starship.sh"
+      ;;
+    7)
+      run_script "./06_install_ble.sh"
+      ;;
+    8)
+      run_script "./07_install_lsd.sh"
+      ;;
+    9)
+      run_script "./08_install_bat.sh"
+      ;;
+    10)
+      run_script "./09_install_fastfetch.sh"
       ;;
     *)
-      echo -e "${RED}Invalid option. Please try again.${NC}"
-      sleep 3
+      echo -e "${RED}Invalid option: $option. Please try again.${NC}"
+      sleep 2 # Shorter sleep for a snappier feel
       ;;
     esac
   done
 }
 
-main
+main "$@"

@@ -48,7 +48,8 @@ is_installed() {
 #######################################
 # Install a package using apt-get.
 # Globals:
-#   None
+#   GREEN
+#   NC
 # Arguments:
 #   $1 - package name
 # Outputs:
@@ -69,6 +70,9 @@ install_pkg() {
 #######################################
 # Verify and install missing dependencies.
 # Globals:
+#   ORANGE
+#   GREEN
+#   NC
 #   PACKAGES
 # Arguments:
 #   None
@@ -91,7 +95,8 @@ check_and_install_dependencies() {
 #######################################
 # Main entry point.
 # Globals:
-#   None
+#   ORANGE
+#   NC
 # Arguments:
 #   None
 # Outputs:
