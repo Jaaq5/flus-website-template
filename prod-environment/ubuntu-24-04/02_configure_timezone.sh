@@ -65,7 +65,7 @@ configure_timezone() {
   updated=$(timedatectl | awk '/Time zone/ {print $3}')
 
   if [[ "$updated" == "$target" ]]; then
-    echo -e "${GREEN}✅ Timezone successfully set to $target${NC}!\n"
+    echo -e "${GREEN}✅ Timezone successfully set to $target!${NC}\n"
   else
     err "Timezone was not correctly updated to $target\n"
     exit 1
