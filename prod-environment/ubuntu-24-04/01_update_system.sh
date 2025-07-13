@@ -43,19 +43,19 @@ err() {
 #######################################
 update_system() {
   echo -e "Updating package list..."
-  if ! sudo apt-get update -qq; then
+  if ! sudo apt-get update -qq >/dev/null; then
     err "Failed to update package list."
     exit 1
   fi
 
   echo -e "Upgrading installed packages..."
-  if ! sudo apt-get upgrade -y -qq; then
+  if ! sudo apt-get upgrade -y -qq >/dev/null; then
     err "Failed to upgrade installed packages."
     exit 1
   fi
 
   echo -e "Removing unnecessary packages..."
-  if ! sudo apt-get autoremove -y -qq; then
+  if ! sudo apt-get autoremove -y -qq >/dev/null; then
     err "Failed to remove unnecessary packages."
     exit 1
   fi

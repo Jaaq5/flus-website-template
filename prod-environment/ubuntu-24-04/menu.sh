@@ -113,7 +113,7 @@ run_script() {
   fi
 
   # Execute the script
-  echo -e "${ORANGE}--- Running ${script_path##*/} ---${NC}"
+  # echo -e "${ORANGE}--- Running ${script_path##*/} ---${NC}"
   "$script_path"
   echo -e "${ORANGE}--- Finished ${script_path##*/} ---${NC}"
   press_q_to_continue

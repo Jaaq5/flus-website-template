@@ -60,7 +60,7 @@ is_installed() {
 install_pkg() {
   local pkg="$1"
   echo -e "Installing package: ${pkg}..."
-  if ! sudo apt-get install -y -qq "$pkg"; then
+  if ! sudo apt-get install -y -qq "$pkg" >/dev/null; then
     err "Failed to install package: ${pkg}"
     exit 1
   fi
