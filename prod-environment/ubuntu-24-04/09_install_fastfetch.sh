@@ -53,8 +53,22 @@ install_fastfetch() {
 
   echo -e "Installing fastfetch..."
 
+  # Add the 'fastfetch' PPA
+  echo -e "Adding fastfetch PPA..."
+  if ! sudo add-apt-repository -y ppa:zhangsongcui3371/fastfetch >/dev/null 2>&1; then
+    err "Failed to add fastfetch PPA."
+    exit 1
+  fi
+
+  # Update package list after adding PPA
+  echo -e "Updating package list after PPA addition..."
+  if ! sudo apt-get update -qq >/dev/null 2>&1; then
+    err "Failed to update package list after adding fastfetch PPA."
+    exit 1
+  fi
+
   # Install fastfetch
-  if ! sudo apt-get install -y -qq fastfetch >/dev/null; then
+  if ! sudo apt-get install -y -qq fastfetch >/dev/null 2>&1; then
     err "Failed to install fastfetch."
     exit 1
   fi

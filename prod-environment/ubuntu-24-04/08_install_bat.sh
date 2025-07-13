@@ -52,7 +52,7 @@ install_bat() {
 
   echo -e "Installing bat..."
 
-  if ! sudo apt-get install -y -qq bat >/dev/null; then
+  if ! sudo apt-get install -y -qq bat >/dev/null 2>&1; then
     err "Failed to install bat."
     exit 1
   fi

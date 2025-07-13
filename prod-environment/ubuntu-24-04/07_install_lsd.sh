@@ -53,7 +53,7 @@ install_lsd() {
 
   echo -e "Installing lsd..."
 
-  if ! sudo apt-get install -y -qq lsd >/dev/null; then
+  if ! sudo apt-get install -y -qq lsd >/dev/null 2>&1; then
     err "Failed to install lsd."
     exit 1
   fi
