@@ -150,22 +150,47 @@ install_firewall() {
     exit 1
   fi
 
-  # Remove ipset if it already exists before creating it to ensure idempotency.
   echo "Ensuring 'sshrange' ipset is in a clean state..."
-  if sudo firewall-cmd --zone=public --query-ipset=sshrange >/dev/null 2>&1; then
-    echo "Removing existing 'sshrange' ipset to re-create it."
-    if ! sudo firewall-cmd --zone=public --remove-ipset=sshrange --permanent \
+  # Attempt to remove existing ipset first, and handle if it's invalid or doesn't exist.
+  # Use a subshell to avoid `set -e` exiting immediately if query/remove fails.
+  (
+    if sudo firewall-cmd --zone=public --query-ipset=sshrange \
       >/dev/null 2>&1; then
-      err "Failed to remove existing 'sshrange' ipset. Aborting firewall setup."
-      exit 1
+      echo "  'sshrange' ipset found. Attempting to remove it..."
+      if ! sudo firewall-cmd --zone=public --remove-ipset=sshrange --permanent \
+        >/dev/null 2>&1; then
+        err "  Warning: Failed to gracefully remove existing 'sshrange' ipset."
+        err "  You may need to manually clean up /etc/firewalld/ipsets/sshrange.xml \
+        and/or references in /etc/firewalld/zones/public.xml"
+        # We don't exit here immediately as we'll try to reload next,
+        # which will fully confirm state.
+        return 1 # Indicate failure in subshell
+      fi
+    else
+      echo "'sshrange' ipset not found or query failed (likely not present)."
     fi
+  )
+
+  # Always try to reload after attempting to remove.
+  # A failed reload here means a deeper issue.
+  echo "  Attempting firewalld reload to confirm clean state before creating ipset..."
+  if ! sudo firewall-cmd --reload >/dev/null 2>&1; then
+    err "  Critical: Firewalld reload failed. \
+    This typically means the permanent configuration is corrupted."
+    err "  Please manually fix firewalld configuration errors before re-running this script."
+    err "  Check logs: 'sudo journalctl -u firewalld' and manually remove invalid entries."
+    err "  Common fix: 'sudo systemctl stop firewalld', \
+    remove /etc/firewalld/ipsets/sshrange.xml and any rich rules referring to \
+    'sshrange' in /etc/firewalld/zones/public.xml, then 'sudo systemctl start firewalld'."
+    exit 1
   fi
 
   # Create an ipset for allowed SSH IP ranges
   echo "Creating ipset for allowed SSH IP ranges..."
   if ! sudo firewall-cmd --zone=public --new-ipset=sshrange --type=hash:net --permanent \
     >/dev/null 2>&1; then
-    err "Failed to create ipset 'sshrange'."
+    # This error here now means a true conflict, not a corrupt state
+    err "Failed to create ipset 'sshrange' after clean up attempt. It might still exist or there's another issue."
     exit 1
   fi
 
