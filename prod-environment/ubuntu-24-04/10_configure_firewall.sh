@@ -74,9 +74,9 @@ purge_firewall() {
       ! sudo iptables -P OUTPUT ACCEPT >/dev/null 2>&1; then
       err "Failed to flush iptables rules."
     fi
-    echo -e "iptables rules reset successfully."
+    echo -e "iptables rules reset successfully.\n"
   else
-    echo "iptables not found."
+    echo -e "iptables not found.\n"
   fi
 }
 
@@ -117,7 +117,7 @@ install_firewall() {
     err "Failed to enable firewalld."
     exit 1
   fi
-  echo "firewalld service is active and enabled."
+  echo -e "firewalld service is active and enabled.\n"
 
   echo "Configuring default zones..."
   if ! sudo firewall-cmd --set-default-zone=public >/dev/null 2>&1; then
@@ -190,7 +190,8 @@ install_firewall() {
   if ! sudo firewall-cmd --zone=public --new-ipset=sshrange --type=hash:net --permanent \
     >/dev/null 2>&1; then
     # This error here now means a true conflict, not a corrupt state
-    err "Failed to create ipset 'sshrange' after clean up attempt. It might still exist or there's another issue."
+    err "Failed to create ipset 'sshrange' after clean up attempt."
+    err "It might still exist or there's another issue."
     exit 1
   fi
 
@@ -310,7 +311,7 @@ configure_sshd_config() {
     exit 1
   fi
 
-  echo "Replacing ${SSHD_CONFIG} with ${NEW_CONFIG}..."
+  echo "Replacing ${SSHD_CONFIG} with template file..."
   if ! sudo cp "${NEW_CONFIG}" "${SSHD_CONFIG}"; then
     err "Failed to replace sshd_config."
     exit 1
