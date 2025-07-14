@@ -14,6 +14,7 @@
 #               ./07_install_lsd.sh
 #               ./08_install_bat.sh
 #               ./09_install_fastfetch.sh
+#               ./10_configure_firewall.sh
 
 # Exit on error, unset variable, or pipeline failure
 set -euo pipefail
@@ -60,6 +61,7 @@ show_menu() {
   echo "8) Install lsd (ls replacement)"
   echo "9) Install bat (cat replacement)"
   echo "10) Install fastfetch (system info)"
+  echo "11) Configure Firewall (firewalld, SSH)"
   echo -e "${ORANGE}=====================================${NC}"
   echo -n "Select an option: "
 }
@@ -169,6 +171,9 @@ main() {
       ;;
     10)
       run_script "./09_install_fastfetch.sh"
+      ;;
+    11)
+      run_script "./10_configure_firewall.sh"
       ;;
     *)
       echo -e "${RED}Invalid option: $option. Please try again.${NC}"
