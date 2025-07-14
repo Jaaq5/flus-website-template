@@ -173,7 +173,7 @@ install_firewall() {
 
   # Always try to reload after attempting to remove.
   # A failed reload here means a deeper issue.
-  echo "  Attempting firewalld reload to confirm clean state before creating ipset..."
+  echo "Attempting firewalld reload to confirm clean state before creating ipset..."
   if ! sudo firewall-cmd --reload >/dev/null 2>&1; then
     err "  Critical: Firewalld reload failed. \
     This typically means the permanent configuration is corrupted."
@@ -240,9 +240,16 @@ install_firewall() {
   fi
 
   echo "Blocking ICMP (ping) traffic..."
-  if ! sudo firewall-cmd --zone=public --add-rich-rule='rule protocol \
-  value="icmp" drop' --permanent >/dev/null 2>&1; then
-    err "Failed to block ICMP."
+  # Check if the ICMP drop rule already exists before adding
+  if sudo firewall-cmd --zone=public --query-rich-rule='rule protocol value="icmp" drop' \
+    >/dev/null 2>&1; then
+    echo "ICMP drop rule already exists. Skipping."
+  else
+    if ! sudo firewall-cmd --zone=public \
+      --add-rich-rule='rule protocol value="icmp" drop' --permanent \
+      >/dev/null 2>&1; then
+      err "Failed to block ICMP."
+    fi
   fi
 
   # Set default target for the zone to DROP,
@@ -326,7 +333,7 @@ configure_sshd_config() {
     exit 1
   fi
 
-  echo -e "${GREEN}sshd_config replaced and SSH restarted successfully.${NC}"
+  echo -e "${GREEN}✅ sshd_config replaced and SSH restarted successfully.${NC}\n"
   echo "Current SSH service status:"
   sudo systemctl status ssh --no-pager || true
   echo ""
@@ -373,8 +380,6 @@ main() {
 
   # Configure sshd_config for secure settings
   configure_sshd_config
-
-  echo -e "${GREEN}✅ Firewall and SSH configuration completed.${NC}"
 }
 
 # Execute the main function
