@@ -4,7 +4,7 @@
 # 04_configure_bashrc.sh
 # Purpose: Backup existing ~/.bashrc and replace with template.
 # Usage: ./04_configure_bashrc.sh
-# Dependencies: bash, files-templates/.bashrc.sh
+# Dependencies: bash, template-files/.bashrc.sh
 
 # Exit on error, unset variable, or pipeline failure
 set -euo pipefail
@@ -43,7 +43,7 @@ err() {
 #   Exits non-zero on failure.
 #######################################
 configure_bashrc() {
-  local template_dir="./files-templates"
+  local template_dir="./template-files"
   local template_file=".bashrc"
   local src="${template_dir}/${template_file}"
   local dest="$HOME/.bashrc"
