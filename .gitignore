@@ -137,3 +137,6 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Custom directories
+/prod-environment/ubuntu-24-04/private/ssh_ip_ranges.sh

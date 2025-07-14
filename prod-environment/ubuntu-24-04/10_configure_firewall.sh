@@ -150,6 +150,17 @@ install_firewall() {
     exit 1
   fi
 
+  # Remove ipset if it already exists before creating it to ensure idempotency.
+  echo "Ensuring 'sshrange' ipset is in a clean state..."
+  if sudo firewall-cmd --zone=public --query-ipset=sshrange >/dev/null 2>&1; then
+    echo "Removing existing 'sshrange' ipset to re-create it."
+    if ! sudo firewall-cmd --zone=public --remove-ipset=sshrange --permanent \
+      >/dev/null 2>&1; then
+      err "Failed to remove existing 'sshrange' ipset. Aborting firewall setup."
+      exit 1
+    fi
+  fi
+
   # Create an ipset for allowed SSH IP ranges
   echo "Creating ipset for allowed SSH IP ranges..."
   if ! sudo firewall-cmd --zone=public --new-ipset=sshrange --type=hash:net --permanent \
@@ -158,14 +169,34 @@ install_firewall() {
     exit 1
   fi
 
-  local ipset_entries=(
-    "201.191.0.0/16"
-    "201.192.0.0/14"
-    "201.196.0.0/14"
-    "201.200.0.0/13"
-  )
+  # Add specific IP ranges to the ipset from a file
+  # https://lite.ip2location.com/ip-address-ranges-by-country
+  local SCRIPT_DIR
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  local IP_RANGES_FILE="${SCRIPT_DIR}/private/ssh_ip_ranges.sh"
 
-  for net in "${ipset_entries[@]}"; do
+  # Check if the IP ranges file exists
+  if [[ ! -f "${IP_RANGES_FILE}" ]]; then
+    err "IP ranges file '${IP_RANGES_FILE}' not found."
+    exit 1
+  fi
+
+  # Source the file to load the SSH_ALLOWED_IP_RANGES array
+  # shellcheck disable=SC1090
+  source "${IP_RANGES_FILE}"
+
+  # Now, the ipset_entries array (which you had before) needs to be defined from the sourced array.
+  # Since we've directly defined SSH_ALLOWED_IP_RANGES, we can use that.
+  # If you prefer to keep the local `ipset_entries` variable, you can copy it:
+  # local ipset_entries=("${SSH_ALLOWED_IP_RANGES[@]}")
+
+  # Use the SSH_ALLOWED_IP_RANGES array directly
+  if [[ ${#SSH_ALLOWED_IP_RANGES[@]} -eq 0 ]]; then
+    err "No IP ranges found in '${IP_RANGES_FILE}'."
+    exit 1
+  fi
+
+  for net in "${SSH_ALLOWED_IP_RANGES[@]}"; do
     echo "Adding ipset entry: ${net}"
     if ! sudo firewall-cmd --zone=public --ipset=sshrange --add-entry="${net}" --permanent \
       >/dev/null 2>&1; then
