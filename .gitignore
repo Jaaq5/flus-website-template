@@ -138,5 +138,6 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
-# Custom directories
+# Custom directories and files
 /prod-environment/ubuntu-24-04/private/ssh_ip_ranges.sh
+/prod-environment/ubuntu-24-04/private/jail.local
