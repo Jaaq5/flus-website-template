@@ -6,7 +6,8 @@
 #          and adjust SSH daemon configuration.
 # Usage: ./10_configure_firewall.sh
 # Dependencies: sudo, apt-get, firewalld, iptables,
-#               ufw, systemctl, sshd
+#               ufw, systemctl, sshd, 11_purge_firewall.sh,
+#               12_configure_sshd_config.sh
 #
 
 # Exit on error, unset variable, or pipeline failure
@@ -14,7 +15,7 @@ set -euo pipefail
 
 # Constants for colored output
 readonly GREEN='\033[0;32m'  # Success
-readonly ORANGE='\033[0;33m' # Info/warning
+readonly ORANGE='\033[0;33m' # Warning
 readonly RED='\033[0;31m'    # Error
 readonly NC='\033[0m'        # No color (reset)
 
@@ -33,51 +34,6 @@ SSH_PORT=""
 #######################################
 err() {
   echo -e "${RED}[$(date +'%Y-%m-%dT%H:%M:%S%z')]: $*${NC}" >&2
-}
-
-#######################################
-# Purges existing firewalls (ufw or iptables) if found.
-# Globals:
-#   None (uses `command_exists` which is global but takes no args/globals)
-# Arguments:
-#   None
-# Outputs:
-#   Messages to STDOUT.
-# Returns:
-#   None.
-#######################################
-purge_firewall() {
-  echo -e "Checking for and removing existing firewalls..."
-
-  # Remove UFW if installed
-  if command -v ufw >/dev/null 2>&1; then
-    echo "Uninstalling ufw..."
-    if ! sudo ufw --force reset >/dev/null 2>&1; then
-      err "Failed to reset ufw."
-    fi
-    if ! sudo apt-get purge -y ufw >/dev/null 2>&1; then
-      err "Failed to purge ufw."
-    fi
-    echo -e "ufw uninstalled successfully."
-  else
-    echo "ufw not found."
-  fi
-
-  # Flush iptables if installed
-  if command -v iptables >/dev/null 2>&1; then
-    echo "Flushing iptables rules..."
-    if ! sudo iptables -F >/dev/null 2>&1 ||
-      ! sudo iptables -t nat -F >/dev/null 2>&1 ||
-      ! sudo iptables -t mangle -F >/dev/null 2>&1 ||
-      ! sudo iptables -P INPUT ACCEPT >/dev/null 2>&1 ||
-      ! sudo iptables -P FORWARD ACCEPT >/dev/null 2>&1 ||
-      ! sudo iptables -P OUTPUT ACCEPT >/dev/null 2>&1; then
-      err "Failed to flush iptables rules."
-    fi
-    echo -e "iptables rules reset successfully.\n"
-  else
-    echo -e "iptables not found.\n"
-  fi
 }
 
 #######################################
@@ -272,75 +228,6 @@ install_firewall() {
 }
 
 #######################################
-# Configures the sshd_config file by backing up and replacing it.
-# Globals:
-#   GREEN
-#   RED
-#   NC
-#   SSH_PORT
-# Arguments:
-#   None
-# Outputs:
-#   Creates a .backup of the current sshd_config and replaces it.
-# Returns:
-#   Exits with error if configuration fails.
-#######################################
-configure_sshd_config() {
-  echo -e "Checking sshd_config configuration..."
-
-  local SSHD_CONFIG="/etc/ssh/sshd_config"
-  local SCRIPT_DIR
-  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-  local NEW_CONFIG="${SCRIPT_DIR}/template-files/sshd_config"
-  local BACKUP_CONFIG="${SSHD_CONFIG}.backup"
-
-  # Check if original exists
-  if [[ ! -f "${SSHD_CONFIG}" ]]; then
-    err "Original sshd_config file '${SSHD_CONFIG}' does not exist."
-    exit 1
-  fi
-
-  echo "Creating backup: ${BACKUP_CONFIG}"
-  if ! sudo cp "${SSHD_CONFIG}" "${BACKUP_CONFIG}"; then
-    err "Failed to create backup of sshd_config."
-    exit 1
-  fi
-
-  if [[ ! -f "${NEW_CONFIG}" ]]; then
-    err "Replacement sshd_config file '${NEW_CONFIG}' not found."
-    exit 1
-  fi
-
-  echo "Replacing ${SSHD_CONFIG} with template file..."
-  if ! sudo cp "${NEW_CONFIG}" "${SSHD_CONFIG}"; then
-    err "Failed to replace sshd_config."
-    exit 1
-  fi
-
-  echo "Setting SSH Port to ${SSH_PORT} in ${SSHD_CONFIG}..."
-  if grep -qE '^Port ' "${SSHD_CONFIG}"; then
-    if ! sudo sed -i "s/^Port .*/Port ${SSH_PORT}/" "${SSHD_CONFIG}"; then
-      err "Failed to update Port in sshd_config."
-      exit 1
-    fi
-  fi
-
-  echo "Restarting SSH service..."
-  if ! sudo systemctl daemon-reload >/dev/null 2>&1; then
-    err "Failed to daemon-reload systemctl."
-  fi
-  if ! sudo systemctl restart ssh >/dev/null 2>&1; then
-    err "Failed to restart SSH service. Check logs for details."
-    exit 1
-  fi
-
-  echo -e "${GREEN}✅ sshd_config replaced and SSH restarted successfully.${NC}\n"
-  echo "Current SSH service status:"
-  sudo systemctl status ssh --no-pager || true
-  echo ""
-}
-
-#######################################
 # Main entry point for the script.
 # Globals:
 #   ORANGE
@@ -373,15 +260,19 @@ main() {
     fi
   done
 
-  # Purge any existing firewalls config (UFW, iptables)
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+  # Source and run purge_firewall
+  # shellcheck source=/dev/null
+  source "${SCRIPT_DIR}/11_purge_firewall.sh"
   purge_firewall
 
-  # Install and configure firewalld with basic rules
   install_firewall
 
-  # Configure sshd_config for secure settings
+  # Source and run configure_sshd_config
+  # shellcheck source=/dev/null
+  source "${SCRIPT_DIR}/12_configure_sshd_config.sh"
   configure_sshd_config
 }
 
-# Execute the main function
 main "$@"
