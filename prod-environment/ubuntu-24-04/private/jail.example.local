@@ -56,7 +56,7 @@ port      = ssh
 # Filter to use. "sshd" refers to /etc/fail2ban/filter.d/sshd.conf
 filter    = sshd
 # Log file where SSH authentication attempts are logged.
-logpath   = /var/log/auth.logsyslog
+logpath   = /var/log/auth.log
 
 # Re-affirm thresholds here (optional)
 bantime   = 3600
@@ -64,8 +64,7 @@ findtime  = 300
 maxretry  = 3
 
 # Standard ban action: iptables + syslog
-action = %(action_)s
-         echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')] [BAN] <ip>" >> /root/.fail2ban_logs
+action = %(action_)s ; echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')] [BAN] <ip>" >> /root/.fail2ban_logs
 
 # 2) SSHD “fail‑only” jail: logs every single failed login
 [ssh-fail]
@@ -76,7 +75,7 @@ port      = ssh
 # Filter to use. "sshd" refers to /etc/fail2ban/filter.d/sshd.conf
 filter    = sshd
 # Log file where SSH authentication attempts are logged.
-logpath   = /var/log/auth.logsyslog
+logpath   = /var/log/auth.log
 
 # On every single fail, ban immediately (maxretry=1),
 # but for just 1 second so the IP can try again.
@@ -86,8 +85,7 @@ bantime   = 1        # 1 second ban == effectively “log only”
 
 # Custom action: append a timestamped fail record to ~/.fail2ban_logs
 # <ip> is replaced by Fail2Ban with the offender IP.
-action    = echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')] [FAIL] <ip>" \
-             >> /root/.fail2ban_logs
+action = %(action_)s ; echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')] [FAIL] <ip>" >> /root/.fail2ban_logs
 
 ############################################################
 # Additional jails can be defined below, e.g. nginx, apache

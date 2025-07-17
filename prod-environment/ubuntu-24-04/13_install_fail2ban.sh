@@ -54,7 +54,7 @@ install_fail2ban() {
   fi
 
   echo "Installing Fail2Ban..."
-  if ! sudo apt-get install -y -qq fail2ban >/dev/null; then
+  if ! sudo apt-get install -y -qq fail2ban >/dev/null 2>&1; then
     err "Failed to install Fail2Ban."
     exit 1
   fi
@@ -85,7 +85,7 @@ install_fail2ban() {
   sudo systemctl enable fail2ban >/dev/null 2>&1
   sudo systemctl restart fail2ban >/dev/null 2>&1
 
-  echo -e "${GREEN}Fail2Ban is now active and configured.${NC}"
+  echo -e "${GREEN}✅ Fail2Ban is now active and configured.${NC}\n"
   sudo systemctl status fail2ban --no-pager || true
   echo ""
 }
