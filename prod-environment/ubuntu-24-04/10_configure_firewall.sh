@@ -1,5 +1,5 @@
 #!/bin/bash
-# Style guide: https://google.github.io/styleguide/shellguide.html
+# Style guide https://google.github.io/styleguide/shellguide.html
 #
 # 10_configure_firewall.sh
 # Purpose: Remove existing ufw/iptables rules, install and configure firewalld,
@@ -54,14 +54,15 @@ err() {
 install_firewall() {
   echo -e "Checking for and installing firewalld..."
 
-  if ! command -v firewall-cmd >/dev/null 2>&1; then
+  if command -v firewall-cmd >/dev/null 2>&1; then
+    echo -e "${ORANGE}firewalld is already installed.${NC}"
+    return 0
+  else
     echo "firewalld not found. Installing..."
     if ! sudo apt-get install -y -qq firewalld >/dev/null; then
       err "Failed to install firewalld."
       exit 1
     fi
-  else
-    echo -e "${ORANGE}firewalld is already installed. Ensuring configuration...${NC}"
   fi
 
   echo "Starting and enabling firewalld..."
