@@ -25,20 +25,8 @@ maxretry = 3  # After 3 failed attempts within findtime, ban is applied.
 # Whitelisted IPs and networks (never banned by Fail2Ban).
 # Use this to exempt trusted internal or national IPs.
 ignoreip = 127.0.0.1/8 ::1 \
-  201.191.0.0/16 \
-  201.192.0.0/14 \
-  201.196.0.0/14 \
-  201.200.0.0/13 \
-  181.193.152.0/21 \
-  181.193.160.0/19 \
-  181.193.192.0/19 \
-  181.193.224.0/19 \
-  181.194.0.0/16 \
-  181.195.0.0/16 \
-  186.176.0.0/16 \
-  186.177.0.0/18 \
-  186.177.64.0/18 \
-  186.177.128.0/18
+  100.100.0.0/16 \
+  100.100.0.0/14
 
 # Backend to use for log monitoring: 'systemd' is ideal on journalctl systems.
 backend = systemd
@@ -100,12 +88,6 @@ bantime   = 1        # 1 second ban == effectively “log only”
 # <ip> is replaced by Fail2Ban with the offender IP.
 action    = echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')] [FAIL] <ip>" \
              >> /root/.fail2ban_logs
-
-# Optional: send email when a ban occurs (uncomment and configure)
-# action = %(action_mwl)s
-
-# You can further customize failregex here if needed:
-# failregex = ^%(__prefix_line)s(?:error: PAM: )?Authentication failure for .* from <HOST>
 
 ############################################################
 # Additional jails can be defined below, e.g. nginx, apache
