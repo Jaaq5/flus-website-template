@@ -79,7 +79,7 @@ install_postfix() {
       exit 1
     }
 
-  echo -e "${GREEN}✅ Test email sent to ${DEST_EMAIL}.${NC}"
+  echo -e "${GREEN}✅ Test email sent to ${DEST_EMAIL}.${NC}\n"
 }
 
 #######################################

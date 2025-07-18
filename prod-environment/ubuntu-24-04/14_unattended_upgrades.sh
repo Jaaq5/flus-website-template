@@ -60,6 +60,14 @@ Unattended-Upgrade::Remove-Unused-Dependencies "true";
 Unattended-Upgrade::Automatic-Reboot "false";
 EOF
 
+  echo "Configuring email notifications for errors only..."
+sudo tee -a /etc/apt/apt.conf.d/50unattended-upgrades >/dev/null <<'EOF'
+// Send mail to this address on problems
+Unattended-Upgrade::Mail "jaaq5@hotmail.com";
+// Options are only-on-error, always, on-change
+Unattended-Upgrade::MailReport "always";
+EOF
+
   echo "Enabling automatic updates..."
   sudo tee /etc/apt/apt.conf.d/20auto-upgrades >/dev/null <<'EOF'
 APT::Periodic::Update-Package-Lists "1";
@@ -67,8 +75,8 @@ APT::Periodic::Unattended-Upgrade "1";
 EOF
 
   echo "Setting timers to run at midnight (CST)..."
-sudo mkdir -p /etc/systemd/system/apt-daily.timer.d
-sudo tee /etc/systemd/system/apt-daily.timer.d/override.conf >/dev/null <<'EOF'
+  sudo mkdir -p /etc/systemd/system/apt-daily.timer.d
+  sudo tee /etc/systemd/system/apt-daily.timer.d/override.conf >/dev/null <<'EOF'
 [Timer]
 OnCalendar=
 OnCalendar=00:00:00
@@ -76,8 +84,8 @@ RandomizedDelaySec=0
 Persistent=true
 EOF
 
-sudo mkdir -p /etc/systemd/system/apt-daily-upgrade.timer.d
-sudo tee /etc/systemd/system/apt-daily-upgrade.timer.d/override.conf >/dev/null <<'EOF'
+  sudo mkdir -p /etc/systemd/system/apt-daily-upgrade.timer.d
+  sudo tee /etc/systemd/system/apt-daily-upgrade.timer.d/override.conf >/dev/null <<'EOF'
 [Timer]
 OnCalendar=
 OnCalendar=00:05:00
@@ -85,13 +93,14 @@ RandomizedDelaySec=0
 Persistent=true
 EOF
 
-echo "Reloading and restarting timers..."
-sudo systemctl daemon-reload
-sudo systemctl restart apt-daily.timer
-sudo systemctl restart apt-daily-upgrade.timer
+  echo "Reloading and restarting timers..."
+  sudo systemctl daemon-reload
+  sudo systemctl restart apt-daily.timer
+  sudo systemctl restart apt-daily-upgrade.timer
 
-echo "Next run times:"
-systemctl list-timers | grep apt-daily
+  echo "Next run times:"
+  systemctl list-timers | grep apt-daily
+  echo -e "${GREEN}✅ Unattended upgrades installed and configured.${NC}\n"
 }
 
 #######################################
