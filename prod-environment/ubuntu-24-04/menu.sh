@@ -65,6 +65,8 @@ show_menu() {
   echo "10) Install fastfetch (system info)"
   echo "11) Configure Firewall (firewalld, SSH)"
   echo "12) Install Fail2Ban (SSH brute-force protection)"
+  echo "13) Install Unattended Upgrades (security updates)"
+  echo "14) Install Postfix (send-only MTA)"
   echo -e "${ORANGE}=====================================${NC}"
   echo -n "Select an option: "
 }
@@ -180,6 +182,12 @@ main() {
       ;;
     12)
       run_script "./13_install_fail2ban.sh"
+      ;;
+      13)
+      run_script "./14_unattended_upgrades.sh"
+      ;;
+    14)
+      run_script "./15_install_postfix.sh"
       ;;
     *)
       echo -e "${RED}Invalid option: $option. Please try again.${NC}"
