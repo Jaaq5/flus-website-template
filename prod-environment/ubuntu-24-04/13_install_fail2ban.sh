@@ -1,5 +1,5 @@
 #!/bin/bash
-# Style guide https://google.github.io/styleguide/shellguide.html
+# Style guide: https://google.github.io/styleguide/shellguide.html
 #
 # 13_install_fail2ban.sh
 # Purpose: Installs and configures Fail2Ban with a basic jail for SSH
@@ -82,7 +82,7 @@ install_fail2ban() {
   echo -e "${GREEN}jail.local created with basic parameters.${NC}"
 
   echo "Enabling and restarting Fail2Ban service..."
-  sudo systemctl enable fail2ban >/dev/null 2>&1
+  sudo systemctl systemctl enable --now fail2ban >/dev/null 2>&1
   sudo systemctl restart fail2ban >/dev/null 2>&1
 
   echo -e "${GREEN}✅ Fail2Ban is now active and configured.${NC}\n"

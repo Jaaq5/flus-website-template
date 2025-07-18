@@ -66,12 +66,8 @@ install_firewall() {
   fi
 
   echo "Starting and enabling firewalld..."
-  if ! sudo systemctl start firewalld >/dev/null 2>&1; then
-    err "Failed to start firewalld."
-    exit 1
-  fi
-  if ! sudo systemctl enable firewalld >/dev/null 2>&1; then
-    err "Failed to enable firewalld."
+  if ! sudo systemctl systemctl enable --now firewalld >/dev/null 2>&1; then
+    err "Failed to start/enable firewalld."
     exit 1
   fi
   echo -e "firewalld service is active and enabled.\n"

@@ -1,26 +1,25 @@
 # Make a copy of this file as jail.local
-# and define your allowed SSH IP ranges below.
+#   and define your allowed SSH IP ranges below.
 
 ############################################################
-# Fail2Ban Configuration File - jail.local
-# Purpose: Ban IPs that show malicious signs (SSHD brute‑force),
-#          and separately log every single fail attempt.
+# Fail2Ban Configuration File - jail.local.
+# Purpose: Ban IPs that show malicious signs (SSHD brute‑force).
 # This file overrides jail.conf and defines local settings.
-# For more details see 'man fail2ban' or online documentation
+# For more details see 'man fail2ban' or online documentation.
 ############################################################
 
 [DEFAULT]
 
 # Ban duration: how long (in seconds) an IP is banned.
 # Set to -1 for a permanent ban.
-bantime = 3600  # 1 hour
+bantime = 43200  # 12 hours
 
 # Find time: the window of time (in seconds) during which
-# the system counts repeated failures before banning.
+#   the system counts repeated failures before banning.
 findtime = 300  # 5 minutes
 
 # Max retry: how many failures before an IP is banned.
-maxretry = 3  # After 3 failed attempts within findtime, ban is applied.
+maxretry = 3  # Ban after 3 failed attempts within findtime.
 
 # Whitelisted IPs and networks (never banned by Fail2Ban).
 # Use this to exempt trusted internal or national IPs.
@@ -28,7 +27,8 @@ ignoreip = 127.0.0.1/8 ::1 \
   100.100.0.0/16 \
   100.100.0.0/14
 
-# Backend to use for log monitoring: 'systemd' is ideal on journalctl systems.
+# Backend to use for log monitoring: 
+#   'systemd' is ideal on journalctl systems.
 backend = systemd
 
 # Notification email (optional)
@@ -47,45 +47,30 @@ backend = systemd
 # SSHD Jail - Protects against brute-force login attempts
 ############################################################
 
-# 1) Primary SSHD jail: bans after 3 fails
 [sshd]
-# Enable this jail
+
+# Enable this jail.
 enabled   = true
+# normal (default), ddos, extra or aggressive (combines all).
+mode      = aggressive
 # Port to monitor; defaults to 'ssh', override if using custom port.
 port      = ssh
-# Filter to use. "sshd" refers to /etc/fail2ban/filter.d/sshd.conf
+# Filter to use, "sshd" refers to /etc/fail2ban/filter.d/sshd.conf
 filter    = sshd
 # Log file where SSH authentication attempts are logged.
-logpath   = /var/log/auth.log
+logpath   = %(sshd_log)s
+# Backend to use for log monitoring: 
+#   'systemd' is ideal on journalctl systems.
+backend = %(sshd_backend)s
 
 # Re-affirm thresholds here (optional)
-bantime   = 3600
+bantime   = 43200
 findtime  = 300
 maxretry  = 3
 
 # Standard ban action: iptables + syslog
-action = %(action_)s ; echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')] [BAN] <ip>" >> /root/.fail2ban_logs
-
-# 2) SSHD “fail‑only” jail: logs every single failed login
-[ssh-fail]
-# Enable this jail
-enabled   = true
-# Port to monitor; defaults to 'ssh', override if using custom port.
-port      = ssh
-# Filter to use. "sshd" refers to /etc/fail2ban/filter.d/sshd.conf
-filter    = sshd
-# Log file where SSH authentication attempts are logged.
-logpath   = /var/log/auth.log
-
-# On every single fail, ban immediately (maxretry=1),
-# but for just 1 second so the IP can try again.
-maxretry  = 1
-findtime  = 300      # still count window, but irrelevant since bantime=1
-bantime   = 1        # 1 second ban == effectively “log only”
-
-# Custom action: append a timestamped fail record to ~/.fail2ban_logs
-# <ip> is replaced by Fail2Ban with the offender IP.
-action = %(action_)s ; echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')] [FAIL] <ip>" >> /root/.fail2ban_logs
+action    = %(action_)s
+#action    = %(action_)s ; echo "[BAN] [$(date +%%Y-%%m-%%dT%%H:%%M:%%S%z)] <ip>" >> /root/.fail2ban_logs
 
 ############################################################
 # Additional jails can be defined below, e.g. nginx, apache

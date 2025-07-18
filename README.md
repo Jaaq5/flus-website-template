@@ -37,3 +37,15 @@ sudo rm /etc/firewalld/ipsets/sshrange.xml
 sudo nano /etc/firewalld/zones/public.xml
 Delete ipset rule
 sudo systemctl start firewalld
+
+# To see fail2ban logs
+
+```bash
+cat /var/log/fail2ban.log
+```
+
+```bash
+tail -f /var/log/fail2ban.log
+```
+
+sudo fail2ban-client status sshd
