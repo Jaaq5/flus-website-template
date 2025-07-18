@@ -49,3 +49,24 @@ tail -f /var/log/fail2ban.log
 ```
 
 sudo fail2ban-client status sshd
+
+# UU
+
+sudo nano /etc/apt/apt.conf.d/50unattended-upgrades
+
+// Dirección de correo del destinatario
+Unattended-Upgrade::Mail "tu@correo.com";
+
+// ¿Cuándo enviar correo?
+// - "on-change": solo si se instalan paquetes.
+// - "only-on-error": solo si falla.
+// - "always": siempre, incluso sin paquetes instalados.
+Unattended-Upgrade::MailReport "only-on-error";
+
+// Opcional: puedes definir el remitente
+Unattended-Upgrade::Sender "failures@mi-servidor.local";
+
+sudo unattended-upgrades --dry-run -d
+
+sudo sed -i 's/only-on-error/always/' /etc/apt/apt.conf.d/50unattended-upgrades
+sudo unattended-upgrades -v

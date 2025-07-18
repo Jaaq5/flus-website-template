@@ -66,11 +66,32 @@ APT::Periodic::Update-Package-Lists "1";
 APT::Periodic::Unattended-Upgrade "1";
 EOF
 
-  echo "Scheduling run at midnight (00:00 Costa Rica)..."
-  sudo systemctl enable --now unattended-upgrades.timer >/dev/null 2>&1
+  echo "Setting timers to run at midnight (CST)..."
+sudo mkdir -p /etc/systemd/system/apt-daily.timer.d
+sudo tee /etc/systemd/system/apt-daily.timer.d/override.conf >/dev/null <<'EOF'
+[Timer]
+OnCalendar=
+OnCalendar=00:00:00
+RandomizedDelaySec=0
+Persistent=true
+EOF
 
-  echo -e "${GREEN}✅ unattended-upgrades configured successfully.${NC}"
-  systemctl status unattended-upgrades.timer --no-pager || true
+sudo mkdir -p /etc/systemd/system/apt-daily-upgrade.timer.d
+sudo tee /etc/systemd/system/apt-daily-upgrade.timer.d/override.conf >/dev/null <<'EOF'
+[Timer]
+OnCalendar=
+OnCalendar=00:05:00
+RandomizedDelaySec=0
+Persistent=true
+EOF
+
+echo "Reloading and restarting timers..."
+sudo systemctl daemon-reload
+sudo systemctl restart apt-daily.timer
+sudo systemctl restart apt-daily-upgrade.timer
+
+echo "Next run times:"
+systemctl list-timers | grep apt-daily
 }
 
 #######################################
