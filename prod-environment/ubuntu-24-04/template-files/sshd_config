@@ -38,7 +38,7 @@ LogLevel VERBOSE
 # Authentication:
 
 LoginGraceTime 1m
-PermitRootLogin prohibit-password
+PermitRootLogin no
 #StrictModes yes
 MaxAuthTries 5
 MaxSessions 3

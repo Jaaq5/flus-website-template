@@ -1,6 +1,7 @@
 #!/bin/bash
 # Style guide: https://google.github.io/styleguide/shellguide.html
 #
+# Package doc: https://wiki.debian.org/UnattendedUpgrades
 # 14_unattended_upgrades.sh
 # Purpose: Installs and configures automatic security updates on Ubuntu.
 # Usage: ./14_unattended_upgrades.sh
