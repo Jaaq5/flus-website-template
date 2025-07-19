@@ -70,3 +70,6 @@ sudo unattended-upgrades --dry-run -d
 
 sudo sed -i 's/only-on-error/always/' /etc/apt/apt.conf.d/50unattended-upgrades
 sudo unattended-upgrades -v
+
+# Consider using
+/etc/apt/apt.conf.d/52unattended-upgrades-local
