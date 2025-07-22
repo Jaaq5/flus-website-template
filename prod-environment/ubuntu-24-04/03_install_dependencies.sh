@@ -1,36 +1,18 @@
 #!/bin/bash
+###############################################################################
 # Style guide: https://google.github.io/styleguide/shellguide.html
 #
 # 03_install_dependencies.sh
 # Purpose: Verify and install required system dependencies.
 # Usage: ./03_install_dependencies.sh
 # Dependencies: sudo, apt-get, dpkg-query
+###############################################################################
 
-# Exit on error, unset variable, or pipeline failure
-set -euo pipefail
+# SOURCES #####################################################################
+# shellcheck source=/dev/null
+source "$(dirname "$0")/sources/common.sh"
 
-# Constants for colored output
-readonly GREEN='\033[0;32m'  # Success
-readonly ORANGE='\033[0;33m' # Info/warning
-readonly RED='\033[0;31m'    # Error
-readonly NC='\033[0m'        # No color (reset)
-
-# List of required packages
-readonly PACKAGES=(curl make gawk vim nano)
-
-#######################################
-# Print an error message to STDERR with timestamp and color.
-# Globals:
-#   RED
-#   NC
-# Arguments:
-#   $*: Error message.
-# Outputs:
-#   Formatted message to STDERR.
-#######################################
-err() {
-  echo -e "${RED}[$(date +'%Y-%m-%dT%H:%M:%S%z')]: $*${NC}" >&2
-}
+# FUNCTIONS ###################################################################
 
 #######################################
 # Check if a package is installed.
