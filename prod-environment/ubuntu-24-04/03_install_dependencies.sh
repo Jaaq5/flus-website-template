@@ -5,7 +5,7 @@
 # 03_install_dependencies.sh
 # Purpose: Verify and install required system dependencies.
 # Usage: ./03_install_dependencies.sh
-# Dependencies: sudo, apt-get, dpkg-query
+# Dependencies: sudo, apt-get, dpkg-query, /sources/common.sh
 ###############################################################################
 
 # SOURCES #####################################################################
@@ -35,9 +35,9 @@ is_installed() {
 # Arguments:
 #   $1 - package name
 # Outputs:
-#   Informational and/or error messages
+#   Messages to STDOUT or to STDERR on error.
 # Returns:
-#   Exits non-zero on failure
+#   0 if successful, exits non-zero on failure.
 #######################################
 install_pkg() {
   local pkg="$1"
@@ -59,11 +59,15 @@ install_pkg() {
 # Arguments:
 #   None
 # Outputs:
-#   Status messages to STDOUT/STDERR.
+#   Messages to STDOUT or to STDERR on error.
 # Returns:
-#   Exits non-zero on any install failure.
+#   0 if successful, exits non-zero on any install failure.
 #######################################
 check_and_install_dependencies() {
+
+  clear
+  echo -e "${ORANGE}🔧 Verifying and installing dependencies...${NC}"
+
   for pkg in "${PACKAGES[@]}"; do
     if is_installed "$pkg"; then
       echo -e "${ORANGE}Already installed: ${pkg}${NC}"
@@ -82,15 +86,12 @@ check_and_install_dependencies() {
 # Arguments:
 #   None
 # Outputs:
-#   Summary messages to STDOUT/STDERR.
+#   Messages to STDOUT or to STDERR on error.
 # Returns:
-#   None; exits on failure.
+#   0 if successful, exits non-zero on failure.
 #######################################
 main() {
-  clear
-  echo -e "${ORANGE}🔧 Verifying and installing dependencies...${NC}"
   check_and_install_dependencies
 }
 
-# Execute main function
 main "$@"
