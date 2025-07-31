@@ -75,7 +75,7 @@ check_and_install_dependencies() {
       install_pkg "$pkg"
     fi
   done
-  echo -e "${GREEN}✅ All dependencies are now satisfied.${NC}\n"
+  echo -e "${GREEN}✅ All dependencies are now installed.${NC}\n"
 }
 
 #######################################

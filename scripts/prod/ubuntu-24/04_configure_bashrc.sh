@@ -1,33 +1,18 @@
 #!/bin/bash
+###############################################################################
 # Style guide: https://google.github.io/styleguide/shellguide.html
 #
 # 04_configure_bashrc.sh
 # Purpose: Backup existing ~/.bashrc and replace with template.
 # Usage: ./04_configure_bashrc.sh
-# Dependencies: bash, template-files/.bashrc.sh
+# Dependencies: bash, /sources/common.sh, /template-files/.bashrc.sh
+###############################################################################
 
-# Exit on error, unset variable, or pipeline failure
-set -euo pipefail
+# SOURCES #####################################################################
+# shellcheck source=/dev/null
+source "$(dirname "$0")/sources/common.sh"
 
-# Constants for colored output
-readonly GREEN='\033[0;32m'  # Success
-readonly ORANGE='\033[0;33m' # Info/warning
-readonly RED='\033[0;31m'    # Error
-readonly NC='\033[0m'        # No color (reset)
-
-#######################################
-# Print an error message to STDERR with timestamp and color.
-# Globals:
-#   RED
-#   NC
-# Arguments:
-#   $*: Error message.
-# Outputs:
-#   Formatted message to STDERR.
-#######################################
-err() {
-  echo -e "${RED}[$(date +'%Y-%m-%dT%H:%M:%S%z')]: $*${NC}" >&2
-}
+# FUNCTIONS ###################################################################
 
 #######################################
 # Backup ~/.bashrc and install new template.
@@ -49,6 +34,8 @@ configure_bashrc() {
   local dest="$HOME/.bashrc"
   local backup="${dest}.backup"
 
+  echo -e "${ORANGE}⚙️ Configuring ~/.bashrc from template...${NC}"
+
   echo -e "Checking for template file at ${src}..."
   if [[ ! -f "$src" ]]; then
     err "Template file '${src}' not found."
@@ -62,30 +49,14 @@ configure_bashrc() {
     echo -e "${ORANGE}No existing ~/.bashrc found; skipping backup.${NC}"
   fi
 
-  echo -e "Installing new .bashrc from template..."
+  echo -e "Copying new .bashrc from template..."
   cp "$src" "$dest"
 
   echo -e "Sourcing updated .bashrc..."
   # shellcheck source=/dev/null
   source "$dest"
 
-  echo -e "${GREEN}✅ .bashrc configured successfully!${NC}\n"
+  echo -e "${GREEN}✅ .bashrc updated successfully!${NC}\n"
 }
 
-#######################################
-# Main entry point.
-# Globals:
-#   ORANGE
-#   NC
-# Arguments:
-#   None
-# Outputs:
-#   Startup message to STDOUT.
-#######################################
-main() {
-  echo -e "${ORANGE}⚙️ Configuring ~/.bashrc from template...${NC}"
-  configure_bashrc
-}
-
-# Execute main function
-main "$@"
+configure_bashrc
